@@ -26,19 +26,22 @@ branchNameLint();
 #### options
 
 Type: `object`
-Default: {
-			prefixes: ['feature', 'hotfix', 'release'],
-			suggestions: {features: 'feature', feat: 'feature', fix: 'hotfix', releases: 'release'},
-			banned: ['wip'],
-			skip: [],
-			disallowed: ['master', 'develop', 'staging'],
-			seperator: '/',
-			msgBranchBanned: 'Branches with the name "%s" are not allowed.',
-			msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
-			msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
-			msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-			msgSeperatorRequiredL: 'Branch "%s" must contain a seperator "%s".'
+Default: 
+```
+{
+  prefixes: ['feature', 'hotfix', 'release'],
+  suggestions: {features: 'feature', feat: 'feature', fix: 'hotfix', releases: 'release'},
+  banned: ['wip'],
+  skip: [],
+  disallowed: ['master', 'develop', 'staging'],
+  seperator: '/',
+  msgBranchBanned: 'Branches with the name "%s" are not allowed.',
+  msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
+  msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
+  msgPrefixSuggestion: 'Instead of "%s" try "%s".',
+  msgSeperatorRequiredL: 'Branch "%s" must contain a seperator "%s".'
 }
+```
 
 ## CLI
 
@@ -62,18 +65,37 @@ $ branch-name-lint --help
 Any Valid JSON file with `branchNameLinter` attribute.
 
 ```
-branchNameLinter: {
-    prefixes: ['feature', 'hotfix', 'release'],
-    suggestions: {features: 'feature', feat: 'feature', fix: 'hotfix', releases: 'release'},
-    banned: ['wip'],
-    skip: [],
-    disallowed: ['master', 'develop', 'staging'],
-    seperator: '/',
-    msgBranchBanned: 'Branches with the name "%s" are not allowed.',
-    msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
-    msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
-    msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-    msgSeperatorRequiredL: 'Branch "%s" must contain a seperator "%s".'
+{
+    "branchNameLinter": {
+        "prefixes": [
+            "feature",
+            "hotfix",
+            "release"
+        ],
+        "suggestions": {
+            "features": "feature",
+            "feat": "feature",
+            "fix": "hotfix",
+            "releases": "release"
+        },
+        "banned": [
+            "wip"
+        ],
+        "skip": [
+            "skip-ci"
+        ],
+        "disallowed": [
+            "master",
+            "develop",
+            "staging"
+        ],
+        "seperator": "/",
+        "msgBranchBanned": "Branches with the name \"%s\" are not allowed.",
+        "msgBranchDisallowed": "Pushing to \"%s\" is not allowed, use git-flow.",
+        "msgPrefixNotAllowed": "Branch prefix \"%s\" is not allowed.",
+        "msgPrefixSuggestion": "Instead of \"%s\" try \"%s\".",
+        "msgSeperatorRequiredL": "Branch \"%s\" must contain a seperator \"%s\"."
+    }
 }
 ```
 
