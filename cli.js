@@ -24,14 +24,17 @@ const configFileName = cli.input[0];
 class BranchNameLintCli {
 	constructor() {
 		this.options = this.loadConfiguration(configFileName);
-		const answer = new BranchNameLint(this.options);
-		console.log(answer.doValidation());
+		const branchNameLint = new BranchNameLint(this.options);
+		const answer = branchNameLint.doValidation()
+		if(answer === 1) {
+			throw new Error();
+		}
 	}
 
 	loadConfiguration(filename = 'package.json') {
 		const pkgFile = findup.sync(process.cwd(), filename);
 		const pkg = JSON.parse(fs.readFileSync(resolve(pkgFile, filename)));
-		return (pkg && pkg.config && pkg.config.branchNameLinter) || {};
+		return (pkg.branchNameLinter) || {};
 	}
 }
 
