@@ -25,8 +25,8 @@ class BranchNameLintCli {
 	constructor() {
 		this.options = this.loadConfiguration(configFileName);
 		const branchNameLint = new BranchNameLint(this.options);
-		const answer = branchNameLint.doValidation()
-		if(answer === 1) {
+		const answer = branchNameLint.doValidation();
+		if (answer === 1) {
 			throw new Error();
 		}
 	}
