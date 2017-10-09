@@ -1,0 +1,39 @@
+{
+  "name": "branch-name-lint",
+  "version": "1.0.0",
+  "description": "Lint your branch names",
+  "license": "MIT",
+  "repository": "barzik/branch-name-lint",
+  "author": {
+    "name": "Ran Bar-Zik",
+    "email": "ran.bar.zik@teamaol.com",
+    "url": "internet-israel.com"
+  },
+  "bin": "cli.js",
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": "xo && nyc ava"
+  },
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
+  "keywords": [
+    "cli-app",
+    "cli",
+    "lint"
+  ],
+  "dependencies": {
+    "findup": "^0.1.5",
+    "lodash": "^4.17.4",
+    "meow": "^3.7.0"
+  },
+  "devDependencies": {
+    "ava": "^0.20.0",
+    "nyc": "^11.0.0",
+    "sinon": "^4.0.1",
+    "xo": "^0.18.2"
+  }
+}
