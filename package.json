@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
@@ -11,10 +11,11 @@
   },
   "bin": "cli.js",
   "engines": {
-    "node": ">=4"
+    "node": ">=6"
   },
   "scripts": {
-    "test": "xo && nyc ava"
+    "test": "./cli.js sample-configuration.json && xo && nyc ava",
+    "prepush": "npm test"
   },
   "files": [
     "index.js",
@@ -32,6 +33,7 @@
   },
   "devDependencies": {
     "ava": "^0.20.0",
+    "husky": "^0.14.3",
     "nyc": "^11.0.0",
     "sinon": "^4.0.1",
     "xo": "^0.18.2"
