@@ -14,7 +14,7 @@
     "node": ">=6"
   },
   "scripts": {
-    "test": "./cli.js sample-configuration.json && xo && nyc ava",
+    "test": "node ./cli.js sample-configuration.json && xo && nyc ava",
     "prepush": "npm test"
   },
   "files": [
