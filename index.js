@@ -17,7 +17,7 @@ class BranchNameLint {
 			msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
 			msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
 			msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-			msgSeperatorRequiredL: 'Branch "%s" must contain a seperator "%s".'
+			msgSeperatorRequired: 'Branch "%s" must contain a seperator "%s".'
 		};
 
 		this.options = Object.assign(defaultOptions, options);
@@ -47,7 +47,7 @@ class BranchNameLint {
 		}
 
 		if (this.branch.indexOf(this.options.seperator) < 0) {
-			return this.error(this.options.msgSeperatorRequired, this.branch);
+			return this.error(this.options.msgSeperatorRequired, this.branch, this.options.seperator);
 		}
 
 		if (this.options.prefixes.indexOf(prefix) < 0) {
