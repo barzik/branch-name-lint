@@ -28,7 +28,6 @@
   ],
   "dependencies": {
     "findup": "^0.1.5",
-    "lodash": "^4.17.4",
     "meow": "^3.7.0"
   },
   "devDependencies": {

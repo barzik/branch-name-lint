@@ -3,7 +3,6 @@
 const os = require('os');
 const exec = require('child_process').execSync;
 const util = require('util');
-const _ = require('lodash');
 
 class BranchNameLint {
 	constructor(options) {
@@ -21,7 +20,7 @@ class BranchNameLint {
 			msgSeperatorRequiredL: 'Branch "%s" must contain a seperator "%s".'
 		};
 
-		this.options = _.extend(defaultOptions, options);
+		this.options = Object.assign(defaultOptions, options);
 		this.branch = this.getCurrentBranch();
 		this.ERROR_CODE = 1;
 		this.SUCCESS_CODE = 0;
