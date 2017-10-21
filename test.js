@@ -62,9 +62,30 @@ test('doValidation is throwing error on seperator', t => {
 
 test('doValidation is throwing error on disallowed', t => {
 	const childProcess = require('child_process');
-	sinon.stub(childProcess, 'execFileSync').returns('blah/valid-name');
+	sinon.stub(childProcess, 'execFileSync').returns('master');
 	const branchNameLint = new BranchNameLint();
 	const result = branchNameLint.doValidation();
 	t.is(result, branchNameLint.ERROR_CODE);
+	childProcess.execFileSync.restore();
+});
+
+test('doValidation is throwing error on banned', t => {
+	const childProcess = require('child_process');
+	sinon.stub(childProcess, 'execFileSync').returns('wip');
+	const branchNameLint = new BranchNameLint();
+	const result = branchNameLint.doValidation();
+	t.is(result, branchNameLint.ERROR_CODE);
+	childProcess.execFileSync.restore();
+});
+
+test('doValidation is passing on skip', t => {
+	const childProcess = require('child_process');
+	sinon.stub(childProcess, 'execFileSync').returns('master/skip');
+	const mockOptions = {
+		skip: ['skip']
+	};
+	const branchNameLint = new BranchNameLint(mockOptions);
+	const result = branchNameLint.doValidation();
+	t.is(result, branchNameLint.SUCCESS_CODE);
 	childProcess.execFileSync.restore();
 });

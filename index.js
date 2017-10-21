@@ -33,7 +33,7 @@ class BranchNameLint {
 			name = parts[1].toLowerCase();
 		}
 
-		if (this.options.skip.indexOf(this.branch) > -1) {
+		if (this.options.skip.length > 0 && this.branch.indexOf(this.options.skip) > -1) {
 			return this.SUCCESS_CODE;
 		}
 
