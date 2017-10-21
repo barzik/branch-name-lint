@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
@@ -28,6 +28,7 @@
   ],
   "dependencies": {
     "findup": "^0.1.5",
+    "git-tools": "^0.2.1",
     "meow": "^3.7.0"
   },
   "devDependencies": {

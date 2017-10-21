@@ -4,7 +4,7 @@
             "feature",
             "hotfix",
             "release",
-            "fix",
+            "bugfix",
             "issue"
         ],
         "suggestions": {

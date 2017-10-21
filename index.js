@@ -1,7 +1,6 @@
 'use strict';
 
-const os = require('os');
-const exec = require('child_process').execSync;
+const childProcess = require('child_process');
 const util = require('util');
 
 class BranchNameLint {
@@ -34,7 +33,7 @@ class BranchNameLint {
 			name = parts[1].toLowerCase();
 		}
 
-		if (this.options.skip.indexOf(this.branch) > -1) {
+		if (this.options.skip.length > 0 && this.branch.indexOf(this.options.skip) > -1) {
 			return this.SUCCESS_CODE;
 		}
 
@@ -66,19 +65,8 @@ class BranchNameLint {
 	}
 
 	getCurrentBranch() {
-		let branch;
-		const IS_WINDOWS = os.platform() === 'win32';
-		if (IS_WINDOWS) {
-			branch = exec('git symbolic-ref HEAD 2> NUL || git rev-parse --short HEAD 2> NUL');
-		} else {
-			branch = exec('git symbolic-ref HEAD 2> /dev/null || git rev-parse --short HEAD 2> /dev/null');
-		}
-
-		if (!branch) {
-			throw new Error('Unable to determine branch name using git command.');
-		}
-
-		return branch.toString().split('\n')[0].replace('refs/heads/', '').toLowerCase();
+		const branch = childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).toString();
+		return branch;
 	}
 
 	error() {
