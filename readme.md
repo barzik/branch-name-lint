@@ -39,7 +39,7 @@ Default:
   msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
   msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
   msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-  msgSeperatorRequiredL: 'Branch "%s" must contain a seperator "%s".'
+  msgSeperatorRequired: 'Branch "%s" must contain a seperator "%s".'
 }
 ```
 
@@ -94,7 +94,7 @@ Any Valid JSON file with `branchNameLinter` attribute.
         "msgBranchDisallowed": "Pushing to \"%s\" is not allowed, use git-flow.",
         "msgPrefixNotAllowed": "Branch prefix \"%s\" is not allowed.",
         "msgPrefixSuggestion": "Instead of \"%s\" try \"%s\".",
-        "msgSeperatorRequiredL": "Branch \"%s\" must contain a seperator \"%s\"."
+        "msgSeperatorRequired": "Branch \"%s\" must contain a seperator \"%s\"."
     }
 }
 ```
