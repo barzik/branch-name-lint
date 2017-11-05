@@ -15,7 +15,9 @@
   },
   "scripts": {
     "test": "xo && nyc ava",
-    "prepush": "npm test && node ./cli.js sample-configuration.json"
+    "prepush": "npm test && node ./cli.js sample-configuration.json",
+    "release": "npm publish",
+    "prerelease": "npm version patch && git push --follow-tags"
   },
   "files": [
     "index.js",
