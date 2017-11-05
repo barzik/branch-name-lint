@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "1.0.4",
+  "version": "1.0.3",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
