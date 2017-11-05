@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
@@ -17,7 +17,7 @@
     "test": "xo && nyc ava",
     "prepush": "npm test && node ./cli.js sample-configuration.json",
     "release": "npm publish",
-    "prerelease": "npm version patch && git push --follow-tags"
+    "prerelease": "npm version patch && git push --follow-tags --no-verify"
   },
   "files": [
     "index.js",
