@@ -1,40 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const findUp = require('find-up');
-const meow = require('meow');
-const BranchNameLint = require('.');
+const childProcess = require('child_process');
 
-const cli = meow(`
-	Usage
-	  $ branch-name-lint [input]
+process.emitWarning('branch-name-lint will stop using ./cli.js path in the future. Please use npx branch-name-lint');
 
-	Options
-	  --foo  Lorem ipsum [Default: false]
-
-	Examples
-	  $ branch-name-lint
-	  unicorns & rainbows
-	  $ branch-name-lint ponies
-	  ponies & rainbows
-`);
-const configFileName = cli.input[0];
-
-class BranchNameLintCli {
-	constructor() {
-		this.options = this.loadConfiguration(configFileName);
-		const branchNameLint = new BranchNameLint(this.options);
-		const answer = branchNameLint.doValidation();
-		if (answer === 1) {
-			throw new Error('Branch lint error');
-		}
-	}
-
-	loadConfiguration(filename = 'package.json') {
-		const pkgFile = findUp.sync(filename);
-		const pkg = JSON.parse(fs.readFileSync(pkgFile));
-		return (pkg.branchNameLinter) || {};
-	}
-}
-
-new BranchNameLintCli(); // eslint-disable-line no-new
+childProcess.fork('./bin/branch-name-lint');

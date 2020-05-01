@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const findUp = require('find-up');
+const meow = require('meow');
+const BranchNameLint = require('../index');
+
+const cli = meow(`
+	Usage
+	  $ npx branch-name-lint [configuration-file.json]
+
+	Options
+	  --help - to get this screen
+
+	Examples
+	  $ branch-name-lint
+	  Use default configutation or the configuration specified in package.json to validate & lint the branch name.
+	  $ branch-name-lint [configuration-file.json]
+	  Use configutation file to validate & lint the branch name.
+`);
+const configFileName = cli.input[0];
+
+class BranchNameLintCli {
+	constructor() {
+		this.options = this.loadConfiguration(configFileName);
+		const branchNameLint = new BranchNameLint(this.options);
+		const answer = branchNameLint.doValidation();
+		if (answer === 1) {
+			throw new Error('Branch lint error');
+		}
+	}
+
+	loadConfiguration(filename = 'package.json') {
+		const pkgFile = findUp.sync(filename);
+		const pkg = JSON.parse(fs.readFileSync(pkgFile));
+		return (pkg.branchNameLinter) || {};
+	}
+}
+
+new BranchNameLintCli(); // eslint-disable-line no-new

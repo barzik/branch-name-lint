@@ -1,6 +1,6 @@
 # branch-name-lint [![Build Status](https://travis-ci.org/barzik/branch-name-lint.svg?branch=master)](https://travis-ci.org/barzik/branch-name-lint) [![Known Vulnerabilities](https://snyk.io/test/github/barzik/branch-name-lint/badge.svg)](https://snyk.io/test/github/barzik//branch-name-lint) ![npm](https://img.shields.io/npm/dt/branch-name-lint)
 
-Allowing to lint the branch names! by CLI or by another means - like Husky or any other CI tool.
+Validating and linting the git branch name. Create a config file or use the default configuration file. Use it in husky config file to make sure that your branch will not be rejected by some pesky Jenkins branch name conventions. You may use it as part of a CI process or just as an handy `npx` command.
 
 ## Install
 
@@ -8,21 +8,21 @@ Allowing to lint the branch names! by CLI or by another means - like Husky or an
 $ npm install branch-name-lint
 ```
 
-## CLI
+## CLI usage
 
 ```
-$ npm install --global branch-name-lint
+$ npx branch-name-lint
 ```
 
 ```
-$ branch-name-lint --help
+$ npx branch-name-lint --help
 
   Usage
-    branch-name-lint [configfileLocation JSON]
+    npx branch-name-lint [configfileLocation JSON]
 
   Examples
     $ branch-name-lint
-    $ branch-name-lint package.json
+    $ branch-name-lint config-file.json
 ```
 
 ### CLI options.json
@@ -71,7 +71,7 @@ After installation, just add in any husky hook as node modules call.
 ```
 "husky": {
     "hooks": {
-        "pre-push": "node ./node_modules/branch-name-lint/cli.js [sample-configuration.json]"
+        "pre-push": "npx branch-name-lint [sample-configuration.json]"
     }
 },
 ```

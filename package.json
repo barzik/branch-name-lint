@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
@@ -9,14 +9,20 @@
     "email": "ran.bar.zik@teamaol.com",
     "url": "https://internet-israel.com"
   },
-  "bin": "cli.js",
+  "bin": {
+    "@barzik/branch-name-lint": "bin/branch-name-lint",
+    "branch-name-lint": "bin/branch-name-lint"
+  },
   "engines": {
     "node": ">=10"
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm test && node ./cli.js sample-configuration.json"
+      "pre-push": "npm test && node ./bin/branch-name-lint sample-configuration.json"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "xo && nyc ava",
@@ -30,7 +36,10 @@
   "keywords": [
     "cli-app",
     "cli",
-    "lint"
+    "branch-name-lint",
+    "lint",
+    "validate",
+    "branch"
   ],
   "dependencies": {
     "find-up": "^4.1.0",
