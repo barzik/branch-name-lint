@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const {resolve} = require('path');
-const findup = require('findup');
+const findup = require('find-up');
 const meow = require('meow');
 const BranchNameLint = require('.');
 
