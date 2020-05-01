@@ -7,16 +7,16 @@ const BranchNameLint = require('../index');
 
 const cli = meow(`
 	Usage
-	  $ branch-name-lint [input]
+	  $ npx branch-name-lint [configuration-file.json]
 
 	Options
-	  --foo  Lorem ipsum [Default: false]
+	  --help - to get this screen
 
 	Examples
 	  $ branch-name-lint
-	  unicorns & rainbows
-	  $ branch-name-lint ponies
-	  ponies & rainbows
+	  Use default configutation or the configuration specified in package.json to validate & lint the branch name.
+	  $ branch-name-lint [configuration-file.json]
+	  Use configutation file to validate & lint the branch name.
 `);
 const configFileName = cli.input[0];
 
