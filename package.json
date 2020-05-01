@@ -30,7 +30,6 @@
   ],
   "dependencies": {
     "find-up": "^4.1.0",
-    "git-tools": "^0.3.0",
     "meow": "^6.1.0"
   },
   "devDependencies": {
