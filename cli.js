@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-'use strict';
+
 const fs = require('fs');
-const resolve = require('path').resolve;
+const {resolve} = require('path');
 const findup = require('findup');
 const meow = require('meow');
-const BranchNameLint = require('./index.js');
+const BranchNameLint = require('.');
 
 const cli = meow(`
 	Usage
@@ -27,7 +27,7 @@ class BranchNameLintCli {
 		const branchNameLint = new BranchNameLint(this.options);
 		const answer = branchNameLint.doValidation();
 		if (answer === 1) {
-			throw new Error();
+			throw new Error('Branch lint error');
 		}
 	}
 
