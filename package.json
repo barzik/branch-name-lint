@@ -15,7 +15,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm test && node ./cli.js sample-configuration.json",
+      "pre-push": "npm test && node ./cli.js sample-configuration.json"
     }
   },
   "scripts": {
