@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
@@ -11,7 +11,7 @@
   },
   "bin": "cli.js",
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "scripts": {
     "test": "xo && nyc ava",
@@ -29,15 +29,15 @@
     "lint"
   ],
   "dependencies": {
-    "findup": "^0.1.5",
-    "git-tools": "^0.2.1",
-    "meow": "^3.7.0"
+    "find-up": "^4.1.0",
+    "git-tools": "^0.3.0",
+    "meow": "^6.1.0"
   },
   "devDependencies": {
-    "ava": "^0.20.0",
-    "husky": "^0.14.3",
-    "nyc": "^11.0.0",
-    "sinon": "^4.0.1",
-    "xo": "^0.18.2"
+    "ava": "^3.8.1",
+    "husky": "^4.2.5",
+    "nyc": "^15.0.1",
+    "sinon": "^9.0.2",
+    "xo": "^0.30.0"
   }
 }

@@ -1,6 +1,6 @@
-import test from 'ava';
-import sinon from 'sinon';
-import BranchNameLint from '.';
+const test = require('ava');
+const sinon = require('sinon');
+const BranchNameLint = require('.');
 
 test('See that constructor have default options', t => {
 	const branchNameLint = new BranchNameLint();
