@@ -1,5 +1,4 @@
-# branch-name-lint [![Build Status](https://travis-ci.org/barzik/branch-name-lint.svg?branch=master)](https://travis-ci.org/barzik/branch-name-lint) [![Known Vulnerabilities](https://snyk.io/test/github/barzik/branch-name-lint/badge.svg)](https://snyk.io/test/github/barzik//branch-name-lint)
-
+# branch-name-lint [![Build Status](https://travis-ci.org/barzik/branch-name-lint.svg?branch=master)](https://travis-ci.org/barzik/branch-name-lint) [![Known Vulnerabilities](https://snyk.io/test/github/barzik/branch-name-lint/badge.svg)](https://snyk.io/test/github/barzik//branch-name-lint)![npm](https://img.shields.io/npm/dt/branch-name-lint)
 
 Allowing to lint the branch names! by CLI or by another means - like Husky or any other CI tool.
 
