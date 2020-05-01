@@ -13,9 +13,13 @@
   "engines": {
     "node": ">=10"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test && node ./cli.js sample-configuration.json",
+    }
+  },
   "scripts": {
     "test": "xo && nyc ava",
-    "pre-push": "npm test && node ./cli.js sample-configuration.json",
     "release": "npm publish",
     "prerelease": "npm version patch && git push --follow-tags --no-verify"
   },
@@ -40,4 +44,3 @@
     "xo": "^0.30.0"
   }
 }
-
