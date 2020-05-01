@@ -7,7 +7,7 @@
   "author": {
     "name": "Ran Bar-Zik",
     "email": "ran.bar.zik@teamaol.com",
-    "url": "internet-israel.com"
+    "url": "https://internet-israel.com"
   },
   "bin": "cli.js",
   "engines": {
