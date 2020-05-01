@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const {resolve} = require('path');
 const findUp = require('find-up');
 const meow = require('meow');
 const BranchNameLint = require('.');
