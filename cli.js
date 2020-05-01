@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const {resolve} = require('path');
-const findup = require('findup');
+const findUp = require('find-up');
 const meow = require('meow');
 const BranchNameLint = require('.');
 
@@ -32,8 +31,8 @@ class BranchNameLintCli {
 	}
 
 	loadConfiguration(filename = 'package.json') {
-		const pkgFile = findup.sync(process.cwd(), filename);
-		const pkg = JSON.parse(fs.readFileSync(resolve(pkgFile, filename)));
+		const pkgFile = findUp.sync(filename);
+		const pkg = JSON.parse(fs.readFileSync(pkgFile));
 		return (pkg.branchNameLinter) || {};
 	}
 }
