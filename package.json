@@ -10,16 +10,19 @@
     "url": "https://internet-israel.com"
   },
   "bin": {
-    "@barzik/branch-lint-name": "bin/branch-lint-name",
-    "branch-lint-name": "bin/branch-lint-name"
+    "@barzik/branch-name-lint": "bin/branch-name-lint",
+    "branch-name-lint": "bin/branch-name-lint"
   },
   "engines": {
     "node": ">=10"
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm test && node ./bin/branch-lint-name sample-configuration.json"
+      "pre-push": "npm test && node ./bin/branch-name-lint sample-configuration.json"
     }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "xo && nyc ava",
@@ -33,7 +36,7 @@
   "keywords": [
     "cli-app",
     "cli",
-    "branch-lint-name",
+    "branch-name-lint",
     "lint",
     "validate",
     "branch"

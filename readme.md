@@ -11,18 +11,18 @@ $ npm install branch-name-lint
 ## CLI
 
 ```
-$ npm install --global branch-name-lint
+$ npx branch-name-lint
 ```
 
 ```
-$ branch-name-lint --help
+$ npx branch-name-lint --help
 
   Usage
-    branch-name-lint [configfileLocation JSON]
+    npx branch-name-lint [configfileLocation JSON]
 
   Examples
     $ branch-name-lint
-    $ branch-name-lint package.json
+    $ branch-name-lint config-file.json
 ```
 
 ### CLI options.json
@@ -71,7 +71,7 @@ After installation, just add in any husky hook as node modules call.
 ```
 "husky": {
     "hooks": {
-        "pre-push": "node ./node_modules/branch-name-lint/cli.js [sample-configuration.json]"
+        "pre-push": "npx branch-name-lint [sample-configuration.json]"
     }
 },
 ```
