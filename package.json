@@ -10,7 +10,6 @@
     "url": "https://internet-israel.com"
   },
   "bin": {
-    "@barzik/branch-name-lint": "bin/branch-name-lint",
     "branch-name-lint": "bin/branch-name-lint"
   },
   "engines": {
