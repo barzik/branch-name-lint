@@ -80,9 +80,9 @@ test('doValidation is throwing error on banned', t => {
 
 test('doValidation is passing on skip', t => {
 	const childProcess = require('child_process');
-	sinon.stub(childProcess, 'execFileSync').returns('master/skip');
+	sinon.stub(childProcess, 'execFileSync').returns('develop');
 	const mockOptions = {
-		skip: ['skip']
+		skip: ['develop']
 	};
 	const branchNameLint = new BranchNameLint(mockOptions);
 	const result = branchNameLint.doValidation();

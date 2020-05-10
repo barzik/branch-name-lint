@@ -31,7 +31,7 @@ class BranchNameLint {
 			name = parts[1].toLowerCase();
 		}
 
-		if (this.options.skip.length > 0 && this.branch.includes(this.options.skip)) {
+		if (this.options.skip.length > 0 && this.options.skip.includes(this.branch)) {
 			return this.SUCCESS_CODE;
 		}
 
@@ -66,7 +66,7 @@ class BranchNameLint {
 
 	getCurrentBranch() {
 		const branch = childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).toString();
-		return branch;
+		return branch.trim();
 	}
 
 	error() {
