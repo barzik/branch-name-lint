@@ -14,13 +14,23 @@ class BranchNameLint {
 			msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
 			msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
 			msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-			msgSeperatorRequired: 'Branch "%s" must contain a seperator "%s".'
+			msgSeperatorRequired: 'Branch "%s" must contain a seperator "%s".',
+			msgDoesNotMatchRegex: 'Does not match the regex given'
 		};
 
 		this.options = Object.assign(defaultOptions, options);
 		this.branch = this.getCurrentBranch();
 		this.ERROR_CODE = 1;
 		this.SUCCESS_CODE = 0;
+	}
+
+	validateWithRegex() {
+		if (this.options.regex) {
+			const REGEX = new RegExp(this.options.regex);
+			return REGEX.test(this.branch);
+		}
+
+		return true;
 	}
 
 	doValidation() {
@@ -45,6 +55,10 @@ class BranchNameLint {
 
 		if (this.branch.includes(this.options.seperator) === false) {
 			return this.error(this.options.msgSeperatorRequired, this.branch, this.options.seperator);
+		}
+
+		if (!this.validateWithRegex()) {
+			return this.error(this.options.msgBranchDisallowed, this.branch, this.options.regex);
 		}
 
 		if (this.options.prefixes.includes(prefix) === false) {
