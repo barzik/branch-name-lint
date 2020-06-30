@@ -64,6 +64,20 @@ Any Valid JSON file with `branchNameLinter` attribute.
 }
 ```
 
+## Usage with regex
+
+In order to check the branch name with a regex you can add a a regex as a string under the branchNameLinter in your config JSON.
+
+```
+{
+    "branchNameLinter": {
+		"regex": "^([A-Z]+-[0-9]+.{5,70})"
+		...
+		"msgDoesNotMatchRegex": "Branch \"%s\" must contain certain characters \"%s\"."
+	}
+}
+```
+
 ## Husky usage
 
 After installation, just add in any husky hook as node modules call.
@@ -92,7 +106,7 @@ branchNameLint();
 #### options
 
 Type: `object`
-Default: 
+Default:
 ```
 {
   prefixes: ['feature', 'hotfix', 'release'],

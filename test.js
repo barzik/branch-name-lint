@@ -24,6 +24,13 @@ test('error prints error', t => {
 	t.is(answer, 1);
 });
 
+test('validateWithRegex', t => {
+	const branchNameLint = new BranchNameLint();
+	branchNameLint.options.regex = '^([A-Z]+-[0-9]+.{5,70})';
+	const validation = branchNameLint.validateWithRegex();
+	t.falsy(validation);
+});
+
 test('getCurrentBranch is working', t => {
 	const childProcess = require('child_process');
 	const branchNameLint = new BranchNameLint();
