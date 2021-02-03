@@ -35,10 +35,10 @@ class BranchNameLint {
 
 	doValidation() {
 		const parts = this.branch.split(this.options.separator);
-		const prefix = parts[0].toLowerCase();
+		const prefix = parts[0];
 		let name = null;
 		if (parts[1]) {
-			name = parts[1].toLowerCase();
+			name = parts[1];
 		}
 
 		if (this.options.skip.length > 0 && this.options.skip.includes(this.branch)) {
