@@ -19,7 +19,7 @@ test('See that constructor accept custom options', t => {
 test('error prints error', t => {
 	const branchNameLint = new BranchNameLint();
 	const callback = sinon.stub(console, 'error');
-	const answer = branchNameLint.error('Branch "%s" must contain a seperator "%s".', 'test1', 'test2');
+	const answer = branchNameLint.error('Branch "%s" must contain a separator "%s".', 'test1', 'test2');
 	t.truthy(callback);
 	t.is(answer, 1);
 });
@@ -58,7 +58,7 @@ test('doValidation is throwing error on prefixes', t => {
 	childProcess.execFileSync.restore();
 });
 
-test('doValidation is throwing error on seperator', t => {
+test('doValidation is throwing error on separator', t => {
 	const childProcess = require('child_process');
 	sinon.stub(childProcess, 'execFileSync').returns('feature-valid-name');
 	const branchNameLint = new BranchNameLint();
