@@ -9,12 +9,12 @@ class BranchNameLint {
 			banned: ['wip'],
 			skip: [],
 			disallowed: ['master', 'develop', 'staging'],
-			seperator: '/',
+			separator: '/',
 			msgBranchBanned: 'Branches with the name "%s" are not allowed.',
 			msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
 			msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
 			msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-			msgSeperatorRequired: 'Branch "%s" must contain a seperator "%s".',
+			msgseparatorRequired: 'Branch "%s" must contain a separator "%s".',
 			msgDoesNotMatchRegex: 'Does not match the regex given'
 		};
 
@@ -34,7 +34,7 @@ class BranchNameLint {
 	}
 
 	doValidation() {
-		const parts = this.branch.split(this.options.seperator);
+		const parts = this.branch.split(this.options.separator);
 		const prefix = parts[0].toLowerCase();
 		let name = null;
 		if (parts[1]) {
@@ -53,8 +53,8 @@ class BranchNameLint {
 			return this.error(this.options.msgBranchDisallowed, this.branch);
 		}
 
-		if (this.branch.includes(this.options.seperator) === false) {
-			return this.error(this.options.msgSeperatorRequired, this.branch, this.options.seperator);
+		if (this.branch.includes(this.options.separator) === false) {
+			return this.error(this.options.msgseparatorRequired, this.branch, this.options.separator);
 		}
 
 		if (!this.validateWithRegex()) {
@@ -65,8 +65,8 @@ class BranchNameLint {
 			if (this.options.suggestions[prefix]) {
 				this.error(
 					this.options.msgPrefixSuggestion,
-					[prefix, name].join(this.options.seperator),
-					[this.options.suggestions[prefix], name].join(this.options.seperator)
+					[prefix, name].join(this.options.separator),
+					[this.options.suggestions[prefix], name].join(this.options.separator)
 				);
 			} else {
 				this.error(this.options.msgPrefixNotAllowed, prefix);

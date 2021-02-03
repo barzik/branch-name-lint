@@ -54,12 +54,12 @@ Any Valid JSON file with `branchNameLinter` attribute.
             "develop",
             "staging"
         ],
-        "seperator": "/",
+        "separator": "/",
         "msgBranchBanned": "Branches with the name \"%s\" are not allowed.",
         "msgBranchDisallowed": "Pushing to \"%s\" is not allowed, use git-flow.",
         "msgPrefixNotAllowed": "Branch prefix \"%s\" is not allowed.",
         "msgPrefixSuggestion": "Instead of \"%s\" try \"%s\".",
-        "msgSeperatorRequired": "Branch \"%s\" must contain a seperator \"%s\"."
+        "msgseparatorRequired": "Branch \"%s\" must contain a separator \"%s\"."
     }
 }
 ```
@@ -114,12 +114,12 @@ Default:
   banned: ['wip'],
   skip: [],
   disallowed: ['master', 'develop', 'staging'],
-  seperator: '/',
+  separator: '/',
   msgBranchBanned: 'Branches with the name "%s" are not allowed.',
   msgBranchDisallowed: 'Pushing to "%s" is not allowed, use git-flow.',
   msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
   msgPrefixSuggestion: 'Instead of "%s" try "%s".',
-  msgSeperatorRequired: 'Branch "%s" must contain a seperator "%s".'
+  msgseparatorRequired: 'Branch "%s" must contain a separator "%s".'
 }
 ```
 
