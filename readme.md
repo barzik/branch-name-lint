@@ -66,14 +66,15 @@ Any Valid JSON file with `branchNameLinter` attribute.
 
 ## Usage with regex
 
-In order to check the branch name with a regex you can add a a regex as a string under the branchNameLinter in your config JSON.
+In order to check the branch name with a regex you can add a a regex as a string under the branchNameLinter in your config JSON. You can also pass any options for the regex (e.g. case insensitive: 'i')
 
 ```
 {
     "branchNameLinter": {
-		"regex": "^([A-Z]+-[0-9]+.{5,70})"
+		"regex": "^([A-Z]+-[0-9]+.{5,70})",
+        "regexOptions": "i",
 		...
-		"msgDoesNotMatchRegex": "Branch \"%s\" must contain certain characters \"%s\"."
+        "msgDoesNotMatchRegex": 'Branch "%s" does not match the allowed pattern: "%s"'
 	}
 }
 ```
@@ -107,6 +108,7 @@ branchNameLint();
 
 Type: `object`
 Default:
+
 ```
 {
   prefixes: ['feature', 'hotfix', 'release'],

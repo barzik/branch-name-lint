@@ -15,7 +15,7 @@ class BranchNameLint {
 			msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
 			msgPrefixSuggestion: 'Instead of "%s" try "%s".',
 			msgseparatorRequired: 'Branch "%s" must contain a separator "%s".',
-			msgDoesNotMatchRegex: 'Does not match the regex given'
+			msgDoesNotMatchRegex: 'Branch "%s" does not match the allowed pattern: "%s"'
 		};
 
 		this.options = Object.assign(defaultOptions, options);
@@ -26,7 +26,7 @@ class BranchNameLint {
 
 	validateWithRegex() {
 		if (this.options.regex) {
-			const REGEX = new RegExp(this.options.regex);
+			const REGEX = new RegExp(this.options.regex, this.options.regexOptions);
 			return REGEX.test(this.branch);
 		}
 
