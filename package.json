@@ -24,9 +24,10 @@
     "access": "public"
   },
   "scripts": {
-    "test": "xo && nyc ava",
+    "test": "npm run lint && nyc ava",
     "release": "npm publish",
-    "prerelease": "npm version patch && git push --follow-tags --no-verify"
+    "prerelease": "npm version patch && git push --follow-tags --no-verify",
+    "lint": "npx eslint '**/*.js' --ignore-pattern 'node_modules/'"
   },
   "files": [
     "index.js",
@@ -41,14 +42,16 @@
     "branch"
   ],
   "dependencies": {
-    "find-up": "^4.1.0",
-    "meow": "^6.1.0"
+    "find-up": "^5.0.0",
+    "meow": "^10.0.1"
   },
   "devDependencies": {
-    "ava": "^3.8.1",
-    "husky": "^4.2.5",
-    "nyc": "^15.0.1",
-    "sinon": "^9.0.2",
-    "xo": "^0.32.1"
+    "ava": "^3.15.0",
+    "eslint": "^7.28.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "husky": "^6.0.0",
+    "nyc": "^15.1.0",
+    "sinon": "^11.1.1"
   }
 }
