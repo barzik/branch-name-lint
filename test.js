@@ -24,11 +24,32 @@ test('error prints error', t => {
 	t.is(answer, 1);
 });
 
-test('validateWithRegex', t => {
+test('validateWithRegex - fail', t => {
 	const branchNameLint = new BranchNameLint();
-	branchNameLint.options.regex = '^([A-Z]+-[0-9]+.{5,70})';
+	branchNameLint.options.regex = '^regex.*-test$';
 	const validation = branchNameLint.validateWithRegex();
 	t.falsy(validation);
+});
+
+test('validateWithRegex - pass with correct regex', t => {
+	const childProcess = require('child_process');
+	sinon.stub(childProcess, 'execFileSync').returns('regex-pattern-test');
+	const branchNameLint = new BranchNameLint();
+	branchNameLint.options.regex = '^regex.*-test$';
+	const validation = branchNameLint.validateWithRegex();
+	t.truthy(validation);
+	childProcess.execFileSync.restore();
+});
+
+test('validateWithRegex and options', t => {
+	const childProcess = require('child_process');
+	sinon.stub(childProcess, 'execFileSync').returns('REGEX-PATTERN-TEST');
+	const branchNameLint = new BranchNameLint();
+	branchNameLint.options.regex = '^regex.*-test$';
+	branchNameLint.options.regexOptions = 'i';
+	const validation = branchNameLint.validateWithRegex();
+	t.truthy(validation);
+	childProcess.execFileSync.restore();
 });
 
 test('getCurrentBranch is working', t => {
