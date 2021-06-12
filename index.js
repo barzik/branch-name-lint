@@ -40,8 +40,8 @@ class BranchNameLint {
     const prefix = parts[0];
     let name = null;
     if (parts[1]) {
-      // eslint-disable-next-line
-      name = parts[1];
+      const [, second] = parts;
+      name = second;
     }
 
     if (this.options.skip.length > 0 && this.options.skip.includes(this.branch)) {
@@ -80,14 +80,14 @@ class BranchNameLint {
 
     return this.SUCCESS_CODE;
   }
-  // eslint-disable-next-line
+
   getCurrentBranch() {
     const branch = childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).toString();
-    return branch.trim();
+    this.branch = branch;
+    return this.branch.trim();
   }
 
   error() {
-    // eslint-disable-next-line
     console.error('Branch name lint fail!', Reflect.apply(util.format, null, arguments)); // eslint-disable-line prefer-rest-params
     return this.ERROR_CODE;
   }
