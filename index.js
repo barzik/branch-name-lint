@@ -24,6 +24,7 @@ class BranchNameLint {
     this.branch = this.getCurrentBranch();
     this.ERROR_CODE = 1;
     this.SUCCESS_CODE = 0;
+    this.CONSOLE_ERROR_OUTPUT_STYLE = '\x1b[41m\x1b[37m%s\x1b[0m';
   }
 
   validateWithRegex() {
@@ -88,7 +89,10 @@ class BranchNameLint {
   }
 
   error() {
-    console.error('Branch name lint fail!', Reflect.apply(util.format, null, arguments)); // eslint-disable-line prefer-rest-params
+    // eslint-disable-next-line no-console
+    console.error(`\n${this.CONSOLE_ERROR_OUTPUT_STYLE}`, 'Branch name linting failed!');
+    // eslint-disable-next-line no-console, prefer-rest-params
+    console.error(`${this.CONSOLE_ERROR_OUTPUT_STYLE}\n`, Reflect.apply(util.format, null, arguments));
     return this.ERROR_CODE;
   }
 }
