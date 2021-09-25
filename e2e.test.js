@@ -25,6 +25,7 @@ test.before(() => {
     fs.mkdirSync(path);
   }
   callToGit(['init']);
+  callToGit(['commit', '--amend', '--no-edit']);
   callToGit(['commit', '--allow-empty', '-n', '-m', 'Initial Commit']);
 });
 
