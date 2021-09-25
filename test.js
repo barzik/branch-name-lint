@@ -20,7 +20,11 @@ test('See that constructor accept custom options', (t) => {
 test('error prints error', (t) => {
   const branchNameLint = new BranchNameLint();
   const callback = sinon.stub(console, 'error');
-  const answer = branchNameLint.error('Branch "%s" must contain a separator "%s".', 'test1', 'test2');
+  const answer = branchNameLint.error(
+    'Branch "%s" must contain a separator "%s".',
+    'test1',
+    'test2'
+  );
   t.truthy(callback);
   t.is(answer, 1);
 });

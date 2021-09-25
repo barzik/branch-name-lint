@@ -6,7 +6,10 @@ class BranchNameLint {
     const defaultOptions = {
       prefixes: ['feature', 'hotfix', 'release'],
       suggestions: {
-        features: 'feature', feat: 'feature', fix: 'hotfix', releases: 'release',
+        features: 'feature',
+        feat: 'feature',
+        fix: 'hotfix',
+        releases: 'release',
       },
       banned: ['wip'],
       skip: [],
@@ -17,7 +20,8 @@ class BranchNameLint {
       msgPrefixNotAllowed: 'Branch prefix "%s" is not allowed.',
       msgPrefixSuggestion: 'Instead of "%s" try "%s".',
       msgseparatorRequired: 'Branch "%s" must contain a separator "%s".',
-      msgDoesNotMatchRegex: 'Branch "%s" does not match the allowed pattern: "%s"',
+      msgDoesNotMatchRegex:
+        'Branch "%s" does not match the allowed pattern: "%s"',
     };
 
     this.options = Object.assign(defaultOptions, options);
@@ -44,7 +48,10 @@ class BranchNameLint {
       name = second;
     }
 
-    if (this.options.skip.length > 0 && this.options.skip.includes(this.branch)) {
+    if (
+      this.options.skip.length > 0 &&
+      this.options.skip.includes(this.branch)
+    ) {
       return this.SUCCESS_CODE;
     }
 
@@ -57,11 +64,19 @@ class BranchNameLint {
     }
 
     if (this.branch.includes(this.options.separator) === false) {
-      return this.error(this.options.msgseparatorRequired, this.branch, this.options.separator);
+      return this.error(
+        this.options.msgseparatorRequired,
+        this.branch,
+        this.options.separator
+      );
     }
 
     if (!this.validateWithRegex()) {
-      return this.error(this.options.msgBranchDisallowed, this.branch, this.options.regex);
+      return this.error(
+        this.options.msgBranchDisallowed,
+        this.branch,
+        this.options.regex
+      );
     }
 
     if (this.options.prefixes.includes(prefix) === false) {
@@ -69,7 +84,7 @@ class BranchNameLint {
         this.error(
           this.options.msgPrefixSuggestion,
           [prefix, name].join(this.options.separator),
-          [this.options.suggestions[prefix], name].join(this.options.separator),
+          [this.options.suggestions[prefix], name].join(this.options.separator)
         );
       } else {
         this.error(this.options.msgPrefixNotAllowed, prefix);
@@ -82,13 +97,18 @@ class BranchNameLint {
   }
 
   getCurrentBranch() {
-    const branch = childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).toString();
+    const branch = childProcess
+      .execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'])
+      .toString();
     this.branch = branch;
     return this.branch.trim();
   }
 
   error() {
-    console.error('Branch name lint fail!', Reflect.apply(util.format, null, arguments)); // eslint-disable-line 
+    console.error(
+      'Branch name lint fail!',
+      Reflect.apply(util.format, null, arguments) // eslint-disable-line
+    );
     return this.ERROR_CODE;
   }
 }

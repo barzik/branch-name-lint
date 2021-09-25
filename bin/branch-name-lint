@@ -33,7 +33,7 @@ class BranchNameLintCli {
 	loadConfiguration(filename = 'package.json') {
 		const pkgFile = findUp.sync(filename);
 		const pkg = JSON.parse(fs.readFileSync(pkgFile));
-		return (pkg.branchNameLinter) || {};
+		return pkg.branchNameLinter || {};
 	}
 }
 

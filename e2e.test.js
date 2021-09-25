@@ -38,7 +38,10 @@ test('End to End test: Should fail on linting master', (t) => {
   callToGit(['checkout', '-b', 'master']);
   const result = callToBranchNameLint();
   t.is(result.status, 1, 'Should return 1 on pushing to master');
-  t.regex(result.stderr, /Branch name lint fail! Pushing to "master" is not allowed/);
+  t.regex(
+    result.stderr,
+    /Branch name lint fail! Pushing to "master" is not allowed/
+  );
 });
 
 test('End to End test: Should pass on linting feature/text', (t) => {
