@@ -27,7 +27,8 @@
     "test": "npm run lint && nyc ava",
     "release": "npm publish",
     "prerelease": "npm version patch && git push --follow-tags --no-verify",
-    "lint": "npx eslint *.js --ignore-path .gitignore"
+    "lint": "npx eslint *.js --ignore-path .gitignore",
+    "lint:fix": "npx eslint *.js --ignore-path .gitignore --fix"
   },
   "files": [
     "index.js",

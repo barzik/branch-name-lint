@@ -88,7 +88,7 @@ class BranchNameLint {
   }
 
   error() {
-    console.error('Branch name lint fail!', Reflect.apply(util.format, null, arguments)); // eslint-disable-line prefer-rest-params
+    console.error('Branch name lint fail!', Reflect.apply(util.format, null, arguments)); // eslint-disable-line 
     return this.ERROR_CODE;
   }
 }

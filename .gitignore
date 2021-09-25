@@ -2,3 +2,4 @@ node_modules
 yarn.lock
 .nyc_output
 coverage
+/e2e
