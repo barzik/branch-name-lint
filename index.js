@@ -61,7 +61,7 @@ class BranchNameLint {
     }
 
     if (!this.validateWithRegex()) {
-      return this.error(this.options.msgBranchDisallowed, this.branch, this.options.regex);
+      return this.error(this.options.msgDoesNotMatchRegex, this.branch, this.options.regex);
     }
 
     if (this.options.prefixes.includes(prefix) === false) {
