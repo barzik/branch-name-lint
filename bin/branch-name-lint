@@ -22,6 +22,7 @@ const configFileName = cli.input[0];
 
 class BranchNameLintCli {
 	constructor() {
+		try{
 		this.options = this.loadConfiguration(configFileName);
 		const branchNameLint = new BranchNameLint(this.options);
 		const answer = branchNameLint.doValidation();
@@ -29,6 +30,8 @@ class BranchNameLintCli {
 			//throw new Error('Branch lint error');
 			process.exit(1);
 		}
+		}
+		catch(e){}
 	}
 
 	loadConfiguration(filename = 'package.json') {
