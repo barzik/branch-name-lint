@@ -25,6 +25,8 @@
   },
   "scripts": {
     "test": "npm run lint && nyc ava",
+    "prepack": "npm prune --production && del package-lock.json && npm shrinkwrap",
+    "postpack": "git checkout package-lock.json && git clean -f npm-shrinkwrap.json",
     "release": "npm publish",
     "prerelease": "npm version patch && git push --follow-tags --no-verify",
     "lint": "npx eslint *.js --ignore-path .gitignore"
