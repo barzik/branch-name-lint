@@ -26,7 +26,7 @@ class BranchNameLintCli {
 		const branchNameLint = new BranchNameLint(this.options);
 		const answer = branchNameLint.doValidation();
 		if (answer === 1) {
-			throw new Error('Branch lint error');
+			process.exit(1);
 		}
 	}
 
