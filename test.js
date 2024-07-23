@@ -107,6 +107,21 @@ test('doValidation is throwing error on banned', (t) => {
   childProcess.execFileSync.restore();
 });
 
+test('doValidation is using correct error message on regex mismatch', (t) => {
+  const childProcess = require('child_process');
+  sinon.stub(childProcess, 'execFileSync').returns('feature/invalid_characters');
+  const branchNameLint = new BranchNameLint({
+    msgDoesNotMatchRegex: 'my error message',
+    regex: '^[a-z0-9/-]+$',
+    regexOptions: 'i'
+  });
+  const errorStub = sinon.stub(branchNameLint, 'error');
+  branchNameLint.doValidation();
+  t.true(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
+  errorStub.restore();
+  childProcess.execFileSync.restore();
+});
+
 test('doValidation is passing on skip', (t) => {
   const childProcess = require('child_process');
   sinon.stub(childProcess, 'execFileSync').returns('develop');
