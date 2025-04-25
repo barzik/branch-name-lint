@@ -36,14 +36,6 @@ class BranchNameLint {
   }
 
   doValidation() {
-    const parts = this.branch.split(this.options.separator);
-    const prefix = parts[0];
-    let name = null;
-    if (parts[1]) {
-      const [, second] = parts;
-      name = second;
-    }
-
     if (this.options.skip.length > 0 && this.options.skip.includes(this.branch)) {
       return this.SUCCESS_CODE;
     }
@@ -56,7 +48,8 @@ class BranchNameLint {
       return this.error(this.options.msgBranchDisallowed, this.branch);
     }
 
-    if (this.branch.includes(this.options.separator) === false) {
+    // Skip separator check if separator is explicitly set to false
+    if (this.options.separator !== false && this.branch.includes(this.options.separator) === false) {
       return this.error(this.options.msgseparatorRequired, this.branch, this.options.separator);
     }
 
@@ -64,12 +57,29 @@ class BranchNameLint {
       return this.error(this.options.msgDoesNotMatchRegex, this.branch, this.options.regex);
     }
 
-    if (this.options.prefixes.includes(prefix) === false) {
+    // If separator is disabled, skip the prefix check
+    if (this.options.separator === false) {
+      return this.SUCCESS_CODE;
+    }
+
+    // Process prefix only if separator is enabled
+    const parts = this.branch.split(this.options.separator);
+    const prefix = parts[0];
+    let name = null;
+    
+    if (parts[1]) {
+      const [, second] = parts;
+      name = second;
+    }
+
+    // Skip prefix check if prefixes is explicitly set to false
+    if (this.options.prefixes !== false && this.options.prefixes.includes(prefix) === false) {
       if (this.options.suggestions[prefix]) {
+        const separator = this.options.separator || '/';
         this.error(
           this.options.msgPrefixSuggestion,
-          [prefix, name].join(this.options.separator),
-          [this.options.suggestions[prefix], name].join(this.options.separator),
+          [prefix, name].join(separator),
+          [this.options.suggestions[prefix], name].join(separator),
         );
       } else {
         this.error(this.options.msgPrefixNotAllowed, prefix);
