@@ -18,6 +18,8 @@ class BranchNameLint {
       msgPrefixSuggestion: 'Instead of "%s" try "%s".',
       msgseparatorRequired: 'Branch "%s" must contain a separator "%s".',
       msgDoesNotMatchRegex: 'Branch "%s" does not match the allowed pattern: "%s"',
+      branch: false,
+      branchNameEnvVariable: false,
     };
 
     this.options = Object.assign(defaultOptions, options);
@@ -92,6 +94,17 @@ class BranchNameLint {
   }
 
   getCurrentBranch() {
+    // First check if a custom branch name was provided via options
+    if (this.options.branch) {
+      return this.options.branch;
+    }
+    
+    // Then check if an environment variable name was provided and has a value
+    if (this.options.branchNameEnvVariable && process.env[this.options.branchNameEnvVariable]) {
+      return process.env[this.options.branchNameEnvVariable];
+    }
+    
+    // Fall back to git command if no custom branch name is provided
     const branch = childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).toString();
     this.branch = branch;
     return this.branch.trim();
