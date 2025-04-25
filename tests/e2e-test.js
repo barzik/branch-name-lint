@@ -192,7 +192,10 @@ console.log(`   Created environment variable configuration at: ${ENV_VAR_CONFIG_
 
 // Test with an invalid branch name via environment variable
 console.log('\n   Testing branchNameEnvVariable with an invalid branch name:');
-const badEnvVarResult = runCommand(`TEST_BRANCH_NAME=invalid-env-branch npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`, { expectError: true });
+const badEnvVarResult = runCommand(`npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`, { 
+  expectError: true,
+  env: { ...process.env, TEST_BRANCH_NAME: "invalid-env-branch" }
+});
 if (!badEnvVarResult.success) {
   console.log('   ✅ Lint correctly failed for invalid branch name provided via environment variable');
 } else {
@@ -202,7 +205,9 @@ if (!badEnvVarResult.success) {
 
 // Test with a valid branch name via environment variable
 console.log('\n   Testing branchNameEnvVariable with a valid branch name:');
-runCommand(`export TEST_BRANCH_NAME=feature/valid-env-branch npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`);
+runCommand(`npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`, {
+  env: { ...process.env, TEST_BRANCH_NAME: "feature/valid-env-branch" }
+});
 console.log('   ✅ Lint correctly passed for valid branch name provided via environment variable');
 
 // Clean up
