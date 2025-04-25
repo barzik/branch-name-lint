@@ -43,7 +43,7 @@ jobs:
             echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
           fi
       - name: Check branch name
-        run: node ./bin/branch-name-lint .github/branch-name-lint.json
+        run: npx branch-name-lint .github/branch-name-lint.json
         env:
           GITHUB_BRANCH_NAME: ${{ env.BRANCH_NAME }}
       - run: npm test
