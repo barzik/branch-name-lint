@@ -1,6 +1,6 @@
 {
   "name": "branch-name-lint",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Lint your branch names",
   "license": "MIT",
   "repository": "barzik/branch-name-lint",
@@ -26,7 +26,7 @@
   "scripts": {
     "test": "node tests/test.js && npm run e2e",
     "e2e": "node ./tests/e2e-test.js",
-    "prepack": "npm prune --production && del package-lock.json && npm shrinkwrap",
+    "prepack": "npm prune --production && rm package-lock.json && npm shrinkwrap",
     "postpack": "git checkout package-lock.json && git clean -f npm-shrinkwrap.json",
     "release": "npm publish",
     "prerelease": "npm version patch && git push --follow-tags --no-verify",

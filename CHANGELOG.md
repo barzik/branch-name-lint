@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v3.0.1] - 2025-04-25
+### Changed
+- Updated GitHub workflow to use Node.js 18
+
 ## [v3.0.0] - 2025-04-25
 ### Fixed
 - Fix incorrect error message upon regex validation failure.
