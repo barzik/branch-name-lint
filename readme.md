@@ -48,7 +48,7 @@ Any Valid JSON file with `branchNameLinter` attribute.
             "feat": "feature",
             "fix": "hotfix",
             "releases": "release"
-        ],
+        },
         "banned": [
             "wip"
         ],
