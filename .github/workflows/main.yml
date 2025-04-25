@@ -34,11 +34,16 @@ jobs:
       - run: npm install
       - name: Extract branch name
         shell: bash
-        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # For pull requests, use the head branch name
+            echo "BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+          else
+            # For pushes, extract from GITHUB_REF
+            echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          fi
       - name: Check branch name
         run: node ./bin/branch-name-lint .github/branch-name-lint.json
         env:
           GITHUB_BRANCH_NAME: ${{ env.BRANCH_NAME }}
-        # Skip this step on PRs by using a conditional
-        if: github.event_name == 'push'
       - run: npm test
