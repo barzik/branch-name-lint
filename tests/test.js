@@ -1,20 +1,44 @@
 // filepath: /Users/spare10/local/open-source/branch-name-lint/tests/test.js
-// Replaced AVA with Node.js native assert module
 const assert = require('assert');
 const sinon = require('sinon');
 const path = require('path');
 const fs = require('fs');
 const BranchNameLint = require('..');
-const childProcess = require('child_process'); // Added missing import for childProcess
+const childProcess = require('child_process');
 
 // Track failed tests to exit with proper code
 let failedTests = 0;
 
+// Store original environment variables
+let originalEnv;
+let originalArgv;
+
+// Setup and teardown to handle environment variables
+function beforeEach() {
+  // Save original environment
+  originalEnv = { ...process.env };
+  originalArgv = [...process.argv];
+  
+  // Clear environment variables for clean testing
+  process.env = {};
+}
+
+function afterEach() {
+  // Restore original environment
+  process.env = originalEnv;
+  process.argv = originalArgv;
+  
+  // Clean up any sinon stubs
+  sinon.restore();
+}
+
 // Updated test cases to use assert instead of AVA
 function test(description, callback) {
   try {
-    // Make sure to restore sinon stubs before each test
-    sinon.restore();
+    // Setup clean environment for each test
+    beforeEach();
+    
+    // Run the test
     callback();
     console.log(`✔ ${description}`);
   } catch (error) {
@@ -22,8 +46,8 @@ function test(description, callback) {
     console.error(error);
     failedTests++; // Increment failed test counter
   } finally {
-    // Ensure stubs are restored after each test
-    sinon.restore();
+    // Clean up after each test
+    afterEach();
   }
 }
 
@@ -48,7 +72,6 @@ test('error prints error', () => {
   const answer = branchNameLint.error('Branch "%s" must contain a separator "%s".', 'test1', 'test2');
   assert(callback);
   assert.strictEqual(answer, 1);
-  callback.restore();
 });
 
 test('error handles multiple arguments', () => {
@@ -57,7 +80,6 @@ test('error handles multiple arguments', () => {
   const answer = branchNameLint.error('Error: %s, Code: %d', 'Invalid branch', 404);
   assert(callback.calledWith('Branch name lint fail!', 'Error: Invalid branch, Code: 404'));
   assert.strictEqual(answer, 1);
-  callback.restore();
 });
 
 test('validateWithRegex - fail', () => {
@@ -68,44 +90,22 @@ test('validateWithRegex - fail', () => {
 });
 
 test('validateWithRegex - pass with correct regex', () => {
-  // Save original environment to restore later
-  const originalEnv = process.env;
-  try {
-    // Clear environment variables for this test
-    process.env = {};
-    
-    sinon.stub(childProcess, 'execFileSync').returns('regex-pattern-test');
-    const branchNameLint = new BranchNameLint();
-    branchNameLint.branch = 'regex-pattern-test'; // Explicitly set branch
-    branchNameLint.options.regex = '^regex.*-test$';
-    const validation = branchNameLint.validateWithRegex();
-    assert(validation);
-  } finally {
-    // Restore environment
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  sinon.stub(childProcess, 'execFileSync').returns('regex-pattern-test');
+  const branchNameLint = new BranchNameLint();
+  branchNameLint.branch = 'regex-pattern-test'; // Explicitly set branch
+  branchNameLint.options.regex = '^regex.*-test$';
+  const validation = branchNameLint.validateWithRegex();
+  assert(validation);
 });
 
 test('validateWithRegex and options', () => {
-  // Save original environment to restore later
-  const originalEnv = process.env;
-  try {
-    // Clear environment variables for this test
-    process.env = {};
-    
-    sinon.stub(childProcess, 'execFileSync').returns('REGEX-PATTERN-TEST');
-    const branchNameLint = new BranchNameLint();
-    branchNameLint.branch = 'REGEX-PATTERN-TEST'; // Explicitly set branch
-    branchNameLint.options.regex = '^regex.*-test$';
-    branchNameLint.options.regexOptions = 'i';
-    const validation = branchNameLint.validateWithRegex();
-    assert(validation);
-  } finally {
-    // Restore environment
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  sinon.stub(childProcess, 'execFileSync').returns('REGEX-PATTERN-TEST');
+  const branchNameLint = new BranchNameLint();
+  branchNameLint.branch = 'REGEX-PATTERN-TEST'; // Explicitly set branch
+  branchNameLint.options.regex = '^regex.*-test$';
+  branchNameLint.options.regexOptions = 'i';
+  const validation = branchNameLint.validateWithRegex();
+  assert(validation);
 });
 
 test('validateWithRegex - invalid regex pattern', () => {
@@ -115,220 +115,148 @@ test('validateWithRegex - invalid regex pattern', () => {
 });
 
 test('getCurrentBranch is working', () => {
-  // Save original environment to restore later
-  const originalEnv = process.env;
-  
-  try {
-    // Clear environment variables for this test
-    process.env = {};
-    
-    const branchNameLint = new BranchNameLint();
-    sinon.stub(childProcess, 'execFileSync').returns('branch mock name');
-    const name = branchNameLint.getCurrentBranch();
-    assert.strictEqual(name, 'branch mock name');
-  } finally {
-    // Restore environment
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  sinon.stub(childProcess, 'execFileSync').returns('branch mock name');
+  const branchNameLint = new BranchNameLint();
+  const name = branchNameLint.getCurrentBranch();
+  assert.strictEqual(name, 'branch mock name');
 });
 
-// New test for environment variable branch specification
+// Tests for environment variable functionality
 test('getCurrentBranch uses environment variable when available', () => {
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup a mock environment
+  process.env.GITHUB_REF = 'refs/heads/feature/test-branch';
   
-  try {
-    // Setup a mock environment
-    process.env = { ...originalEnv, GITHUB_REF: 'refs/heads/feature/test-branch' };
-    
-    const branchNameLint = new BranchNameLint();
-    // We should not need execFileSync at all
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // Verify branch name is extracted from GITHUB_REF
-    assert.strictEqual(name, 'feature/test-branch');
-    // execFileSync should not be called
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original process.env
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  const branchNameLint = new BranchNameLint({
+    branchEnvVariable: 'GITHUB_REF'
+  });
+  
+  // We should not need execFileSync at all
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Verify branch name is extracted from GITHUB_REF
+  assert.strictEqual(name, 'feature/test-branch');
+  // execFileSync should not be called
+  assert.strictEqual(execStub.called, false);
 });
 
-// New test for environment variable without refs/heads/ prefix
 test('getCurrentBranch handles environment variable without refs/heads/ prefix', () => {
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup a mock environment with direct branch name
+  process.env.GITHUB_REF = 'feature/direct-branch';
   
-  try {
-    // Setup a mock environment with direct branch name
-    process.env = { ...originalEnv, GITHUB_REF: 'feature/direct-branch' };
-    
-    const branchNameLint = new BranchNameLint();
-    // We should not need execFileSync at all
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // Verify branch name is used as is when no refs/heads/ prefix
-    assert.strictEqual(name, 'feature/direct-branch');
-    // execFileSync should not be called
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original process.env
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  const branchNameLint = new BranchNameLint({
+    branchEnvVariable: 'GITHUB_REF'
+  });
+  
+  // We should not need execFileSync at all
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Verify branch name is used as is when no refs/heads/ prefix
+  assert.strictEqual(name, 'feature/direct-branch');
+  // execFileSync should not be called
+  assert.strictEqual(execStub.called, false);
 });
 
-// New test for CLI option override
 test('getCurrentBranch uses CLI option when available', () => {
-  // Save original process.argv
-  const originalArgv = process.argv;
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup environment variable
+  process.env.GITHUB_REF = 'refs/heads/feature/env-branch';
   
-  try {
-    // Setup environment variable
-    process.env = { ...originalEnv, GITHUB_REF: 'refs/heads/feature/env-branch' };
-    // Setup CLI argument that should override env var
-    process.argv = [...originalArgv, '--branch', 'feature/cli-branch'];
-    
-    const branchNameLint = new BranchNameLint();
-    // We should not need execFileSync at all
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // CLI option should take precedence over environment variable
-    assert.strictEqual(name, 'feature/cli-branch');
-    // execFileSync should not be called
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original values
-    process.argv = originalArgv;
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  // Setup CLI argument that should override env var
+  process.argv.push('--branch', 'feature/cli-branch');
+  
+  const branchNameLint = new BranchNameLint({
+    branchEnvVariable: 'GITHUB_REF'
+  });
+  
+  // We should not need execFileSync at all
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // CLI option should take precedence over environment variable
+  assert.strictEqual(name, 'feature/cli-branch');
+  // execFileSync should not be called
+  assert.strictEqual(execStub.called, false);
 });
 
-// New test for custom environment variable name
 test('getCurrentBranch supports custom environment variable name', () => {
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup a mock environment with custom env var
+  process.env.CUSTOM_BRANCH_ENV = 'feature/custom-env-branch';
   
-  try {
-    // Setup a mock environment with custom env var
-    process.env = { ...originalEnv, CUSTOM_BRANCH_ENV: 'feature/custom-env-branch' };
-    
-    const branchNameLint = new BranchNameLint({ branchEnvVariable: 'CUSTOM_BRANCH_ENV' });
-    // We should not need execFileSync at all
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // Verify custom environment variable is used
-    assert.strictEqual(name, 'feature/custom-env-branch');
-    // execFileSync should not be called
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original process.env
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  const branchNameLint = new BranchNameLint({ 
+    branchEnvVariable: 'CUSTOM_BRANCH_ENV' 
+  });
+  
+  // We should not need execFileSync at all
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Verify custom environment variable is used
+  assert.strictEqual(name, 'feature/custom-env-branch');
+  // execFileSync should not be called
+  assert.strictEqual(execStub.called, false);
 });
 
-// New tests for GITHUB_REF vs other environment variables
 test('getCurrentBranch extracts branch name from GITHUB_REF if it has refs/heads/ format', () => {
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup a mock environment with GitHub-style ref
+  process.env.GITHUB_REF = 'refs/heads/feature/github-style-branch';
   
-  try {
-    // Setup a mock environment with GitHub-style ref
-    process.env = { ...originalEnv, GITHUB_REF: 'refs/heads/feature/github-style-branch' };
-    
-    const branchNameLint = new BranchNameLint();
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // Verify branch name is extracted from refs/heads/ prefix
-    assert.strictEqual(name, 'feature/github-style-branch');
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original process.env
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  const branchNameLint = new BranchNameLint({
+    branchEnvVariable: 'GITHUB_REF'
+  });
+  
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Verify branch name is extracted from refs/heads/ prefix
+  assert.strictEqual(name, 'feature/github-style-branch');
+  assert.strictEqual(execStub.called, false);
 });
 
 test('getCurrentBranch does NOT extract from refs/heads/ if using custom env variable', () => {
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup a mock environment with GitHub-style ref but in a custom variable
+  process.env.CUSTOM_VAR = 'refs/heads/should-not-extract';
   
-  try {
-    // Setup a mock environment with GitHub-style ref but in a custom variable
-    process.env = { ...originalEnv, CUSTOM_VAR: 'refs/heads/should-not-extract' };
-    
-    const branchNameLint = new BranchNameLint({ branchEnvVariable: 'CUSTOM_VAR' });
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // Verify the whole string is used as is (no extraction)
-    assert.strictEqual(name, 'refs/heads/should-not-extract');
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original process.env
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  const branchNameLint = new BranchNameLint({ 
+    branchEnvVariable: 'CUSTOM_VAR' 
+  });
+  
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Verify the whole string is used as is (no extraction)
+  assert.strictEqual(name, 'refs/heads/should-not-extract');
+  assert.strictEqual(execStub.called, false);
 });
 
 test('getCurrentBranch uses direct branch name from GITHUB_REF if no refs/heads/ format', () => {
-  // Save original process.env
-  const originalEnv = process.env;
+  // Setup a mock environment with direct branch name in GITHUB_REF
+  process.env.GITHUB_REF = 'feature/direct-branch';
   
-  try {
-    // Setup a mock environment with direct branch name in GITHUB_REF
-    process.env = { ...originalEnv, GITHUB_REF: 'feature/direct-branch' };
-    
-    const branchNameLint = new BranchNameLint();
-    const execStub = sinon.stub(childProcess, 'execFileSync');
-    
-    const name = branchNameLint.getCurrentBranch();
-    
-    // Verify branch name is used as is
-    assert.strictEqual(name, 'feature/direct-branch');
-    assert.strictEqual(execStub.called, false);
-  } finally {
-    // Restore original process.env
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  const branchNameLint = new BranchNameLint({
+    branchEnvVariable: 'GITHUB_REF'
+  });
+  
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Verify branch name is used as is
+  assert.strictEqual(name, 'feature/direct-branch');
+  assert.strictEqual(execStub.called, false);
 });
 
 test('doValidation is working', () => {
-  // Save original environment to restore later
-  const originalEnv = process.env;
-  
-  try {
-    // Clear environment variables for this test
-    process.env = {};
-    
-    sinon.stub(childProcess, 'execFileSync').returns('feature/valid-name');
-    const branchNameLint = new BranchNameLint();
-    const result = branchNameLint.doValidation();
-    assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
-  } finally {
-    // Restore environment
-    process.env = originalEnv;
-    sinon.restore();
-  }
+  sinon.stub(childProcess, 'execFileSync').returns('feature/valid-name');
+  const branchNameLint = new BranchNameLint();
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
 });
 
 test('doValidation is throwing error on prefixes', () => {
@@ -336,7 +264,6 @@ test('doValidation is throwing error on prefixes', () => {
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
-  childProcess.execFileSync.restore();
 });
 
 test('doValidation is throwing error on separator', () => {
@@ -344,7 +271,6 @@ test('doValidation is throwing error on separator', () => {
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
-  childProcess.execFileSync.restore();
 });
 
 test('doValidation is throwing error on disallowed', () => {
@@ -352,7 +278,6 @@ test('doValidation is throwing error on disallowed', () => {
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
-  childProcess.execFileSync.restore();
 });
 
 test('doValidation is throwing error on banned', () => {
@@ -360,47 +285,28 @@ test('doValidation is throwing error on banned', () => {
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
-  childProcess.execFileSync.restore();
 });
 
 test('doValidation is using correct error message on regex mismatch', () => {
-  // Ensure no environment variables are interfering
-  const originalEnv = process.env;
-  try {
-    process.env = {}; // Clear environment variables for this test
-    
-    sinon.stub(childProcess, 'execFileSync').returns('feature/invalid_characters');
-    const branchNameLint = new BranchNameLint({
-      msgDoesNotMatchRegex: 'my error message',
-      regex: '^[a-z0-9/-]+$',
-      regexOptions: 'i',
-    });
-    const errorStub = sinon.stub(branchNameLint, 'error');
-    branchNameLint.doValidation();
-    assert(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
-  } finally {
-    process.env = originalEnv; // Restore environment variables
-    sinon.restore();
-  }
+  sinon.stub(childProcess, 'execFileSync').returns('feature/invalid_characters');
+  const branchNameLint = new BranchNameLint({
+    msgDoesNotMatchRegex: 'my error message',
+    regex: '^[a-z0-9/-]+$',
+    regexOptions: 'i',
+  });
+  const errorStub = sinon.stub(branchNameLint, 'error');
+  branchNameLint.doValidation();
+  assert(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
 });
 
 test('doValidation is passing on skip', () => {
-  // Ensure no environment variables are interfering
-  const originalEnv = process.env;
-  try {
-    process.env = {}; // Clear environment variables for this test
-    
-    sinon.stub(childProcess, 'execFileSync').returns('develop');
-    const mockOptions = {
-      skip: ['develop'],
-    };
-    const branchNameLint = new BranchNameLint(mockOptions);
-    const result = branchNameLint.doValidation();
-    assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
-  } finally {
-    process.env = originalEnv; // Restore environment variables
-    sinon.restore();
-  }
+  sinon.stub(childProcess, 'execFileSync').returns('develop');
+  const mockOptions = {
+    skip: ['develop'],
+  };
+  const branchNameLint = new BranchNameLint(mockOptions);
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
 });
 
 test('doValidation applies suggestions', () => {
@@ -408,7 +314,6 @@ test('doValidation applies suggestions', () => {
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
-  childProcess.execFileSync.restore();
 });
 
 // Add tests for disabling separator and prefix checks
@@ -445,10 +350,6 @@ test('loadConfiguration can load JavaScript configuration files', () => {
   // Create a mock implementation of parts of the bin/branch-name-lint module
   const path = require('path');
   const fs = require('fs');
-  
-  // Save original implementations
-  const originalReadFileSync = fs.readFileSync;
-  const originalRequire = require;
   
   // Create test class similar to what's in bin/branch-name-lint
   class TestLoader {

@@ -29,6 +29,7 @@ const JSON_CONFIG_PATH = path.join(__dirname, 'sample-configuration.json');
 const JS_CONFIG_PATH = path.join(__dirname, 'sample-configuration.js');
 const DISABLED_CONFIG_PATH = path.join(TEST_DIR, 'disabled-config.json');
 const PROJECT_ROOT = path.join(__dirname, '..');
+const ENV_CONFIG_PATH = path.join(TEST_DIR, 'env-config.json');
 
 // Utility function to execute commands with better error handling
 function runCommand(cmd, options = {}) {
@@ -159,14 +160,25 @@ console.log('   ✅ Lint correctly passed for branch with disabled checks');
 // Test with environment variables and CLI options
 console.log('\n8️⃣  Testing with environment variables and CLI options...');
 
+// Create a configuration file that includes the branchEnvVariable option
+const envConfig = {
+  branchNameLinter: {
+    prefixes: ['feature', 'hotfix', 'release'],
+    separator: '/',
+    branchEnvVariable: 'GITHUB_REF'
+  }
+};
+fs.writeFileSync(ENV_CONFIG_PATH, JSON.stringify(envConfig, null, 2));
+console.log(`   Created env variable config at: ${ENV_CONFIG_PATH}`);
+
 // First test with environment variable GITHUB_REF
 console.log('\n   Testing with GITHUB_REF environment variable (refs format)...');
-const envResult = runCommand(`GITHUB_REF=refs/heads/feature/env-branch npx branch-name-lint ${JSON_CONFIG_PATH}`);
+const envResult = runCommand(`GITHUB_REF=refs/heads/feature/env-branch npx branch-name-lint ${ENV_CONFIG_PATH}`);
 console.log('   ✅ Lint correctly passed using GITHUB_REF environment variable');
 
 // Test with direct branch name format
 console.log('\n   Testing with GITHUB_REF environment variable (direct format)...');
-const directEnvResult = runCommand(`GITHUB_REF=feature/direct-env npx branch-name-lint ${JSON_CONFIG_PATH}`);
+const directEnvResult = runCommand(`GITHUB_REF=feature/direct-env npx branch-name-lint ${ENV_CONFIG_PATH}`);
 console.log('   ✅ Lint correctly passed using direct branch name in environment variable');
 
 // Test with CLI option
@@ -186,12 +198,12 @@ if (!invalidCliResult.success) {
 
 // Test environment variable priority (CLI should override env var)
 console.log('\n   Testing CLI option overriding environment variable...');
-const priorityResult = runCommand(`GITHUB_REF=refs/heads/invalid-branch npx branch-name-lint ${JSON_CONFIG_PATH} --branch feature/override-branch`);
+const priorityResult = runCommand(`GITHUB_REF=refs/heads/invalid-branch npx branch-name-lint ${ENV_CONFIG_PATH} --branch feature/override-branch`);
 console.log('   ✅ Lint correctly passed with CLI option overriding environment variable');
 
 // Add specific test for GitHub-style refs extraction
 console.log('\n   Testing GitHub-style refs extraction from GITHUB_REF...');
-const githubRefResult = runCommand(`GITHUB_REF=refs/heads/feature/github-format npx branch-name-lint ${JSON_CONFIG_PATH}`);
+const githubRefResult = runCommand(`GITHUB_REF=refs/heads/feature/github-format npx branch-name-lint ${ENV_CONFIG_PATH}`);
 console.log('   ✅ Lint correctly passed using extracted branch name from GITHUB_REF');
 
 // Test with a custom env variable that contains refs/heads/ but doesn't extract it

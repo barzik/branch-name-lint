@@ -2,7 +2,7 @@ const childProcess = require('child_process');
 const util = require('util');
 
 class BranchNameLint {
-  constructor(options) {
+  constructor(options = {}) {
     const defaultOptions = {
       prefixes: ['feature', 'hotfix', 'release'],
       suggestions: {
@@ -18,7 +18,7 @@ class BranchNameLint {
       msgPrefixSuggestion: 'Instead of "%s" try "%s".',
       msgseparatorRequired: 'Branch "%s" must contain a separator "%s".',
       msgDoesNotMatchRegex: 'Branch "%s" does not match the allowed pattern: "%s"',
-      branchEnvVariable: 'GITHUB_REF',
+      // No default value for branchEnvVariable to maintain backward compatibility
     };
 
     this.options = Object.assign(defaultOptions, options);
@@ -101,9 +101,9 @@ class BranchNameLint {
       }
     }
     
-    // Only check for environment variable if branchEnvVariable is explicitly provided in options
-    // This maintains backward compatibility with existing behavior
-    if (this.options.branchEnvVariable !== undefined && process.env[this.options.branchEnvVariable]) {
+    // Only check for environment variable if branchEnvVariable is explicitly set
+    // This ensures backward compatibility
+    if (this.options.branchEnvVariable && process.env[this.options.branchEnvVariable]) {
       let branchName = process.env[this.options.branchEnvVariable].trim();
       
       // Special handling for GITHUB_REF to extract branch name from refs/heads/ format
