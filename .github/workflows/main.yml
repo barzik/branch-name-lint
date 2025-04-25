@@ -33,3 +33,9 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - run: npm install
       - run: npm test
+      
+      # Add branch name linting step using environment variable feature
+      - name: Lint branch name
+        run: npx branch-name-lint
+        env:
+          GITHUB_REF: ${{ github.ref }}

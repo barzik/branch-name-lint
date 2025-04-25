@@ -8,16 +8,24 @@ const BranchNameLint = require('../index');
 
 const cli = meow(`
 	Usage
-	  $ npx branch-name-lint [configuration-file.json|configuration-file.js]
+	  $ npx branch-name-lint [configuration-file.json|configuration-file.js] [options]
 
 	Options
-	  --help - to get this screen
+	  --help             - to get this screen
+	  --branch <name>    - specify branch name manually (overrides environment variable)
+
+	Environment Variables
+	  GITHUB_REF         - can be used to specify branch name (e.g., refs/heads/feature-branch-1)
 
 	Examples
 	  $ branch-name-lint
 	  Use default configutation or the configuration specified in package.json to validate & lint the branch name.
 	  $ branch-name-lint [configuration-file.json|configuration-file.js]
 	  Use configutation file to validate & lint the branch name.
+	  $ branch-name-lint --branch feature/my-branch
+	  Lint a specific branch name instead of the current git branch.
+	  $ GITHUB_REF=refs/heads/feature/my-branch branch-name-lint
+	  Use branch name from environment variable.
 `);
 const configFileName = cli.input[0];
 

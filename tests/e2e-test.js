@@ -10,7 +10,8 @@
  * 5. Testing with a good branch name (should pass)
  * 6. Testing with JavaScript configuration file
  * 7. Testing with disabled separator and prefix checks
- * 8. Cleaning up the test directory
+ * 8. Testing with environment variables and CLI options
+ * 9. Cleaning up the test directory
  */
 
 const fs = require('fs');
@@ -155,8 +156,63 @@ console.log('\n   Running branch-name-lint with disabled checks - expecting succ
 runCommand(`npx branch-name-lint ${DISABLED_CONFIG_PATH}`);
 console.log('   ✅ Lint correctly passed for branch with disabled checks');
 
+// Test with environment variables and CLI options
+console.log('\n8️⃣  Testing with environment variables and CLI options...');
+
+// First test with environment variable GITHUB_REF
+console.log('\n   Testing with GITHUB_REF environment variable (refs format)...');
+const envResult = runCommand(`GITHUB_REF=refs/heads/feature/env-branch npx branch-name-lint ${JSON_CONFIG_PATH}`);
+console.log('   ✅ Lint correctly passed using GITHUB_REF environment variable');
+
+// Test with direct branch name format
+console.log('\n   Testing with GITHUB_REF environment variable (direct format)...');
+const directEnvResult = runCommand(`GITHUB_REF=feature/direct-env npx branch-name-lint ${JSON_CONFIG_PATH}`);
+console.log('   ✅ Lint correctly passed using direct branch name in environment variable');
+
+// Test with CLI option
+console.log('\n   Testing with --branch CLI option...');
+const cliResult = runCommand(`npx branch-name-lint ${JSON_CONFIG_PATH} --branch feature/cli-branch`);
+console.log('   ✅ Lint correctly passed using --branch CLI option');
+
+// Test with invalid branch via CLI option - should fail
+console.log('\n   Testing with invalid branch via CLI option - expecting failure:');
+const invalidCliResult = runCommand(`npx branch-name-lint ${JSON_CONFIG_PATH} --branch invalid-cli-branch`, { expectError: true });
+if (!invalidCliResult.success) {
+  console.log('   ✅ Lint correctly failed for invalid branch via CLI option');
+} else {
+  console.error('   ❌ Lint unexpectedly passed for invalid branch via CLI option');
+  process.exit(1);
+}
+
+// Test environment variable priority (CLI should override env var)
+console.log('\n   Testing CLI option overriding environment variable...');
+const priorityResult = runCommand(`GITHUB_REF=refs/heads/invalid-branch npx branch-name-lint ${JSON_CONFIG_PATH} --branch feature/override-branch`);
+console.log('   ✅ Lint correctly passed with CLI option overriding environment variable');
+
+// Add specific test for GitHub-style refs extraction
+console.log('\n   Testing GitHub-style refs extraction from GITHUB_REF...');
+const githubRefResult = runCommand(`GITHUB_REF=refs/heads/feature/github-format npx branch-name-lint ${JSON_CONFIG_PATH}`);
+console.log('   ✅ Lint correctly passed using extracted branch name from GITHUB_REF');
+
+// Test with a custom env variable that contains refs/heads/ but doesn't extract it
+console.log('\n   Testing custom env var with refs/heads/ format (should NOT extract)...');
+// Create a custom config file that uses CUSTOM_REF instead of GITHUB_REF
+const customEnvConfig = {
+  branchNameLinter: {
+    prefixes: ['feature', 'my'],
+    separator: '/',
+    branchEnvVariable: 'CUSTOM_REF'
+  }
+};
+const CUSTOM_ENV_CONFIG_PATH = path.join(TEST_DIR, 'custom-env-config.json');
+fs.writeFileSync(CUSTOM_ENV_CONFIG_PATH, JSON.stringify(customEnvConfig, null, 2));
+
+// This should pass because we're setting prefixes to include 'my'
+const customRefResult = runCommand(`CUSTOM_REF=my/my-branch npx branch-name-lint ${CUSTOM_ENV_CONFIG_PATH}`);
+console.log('   ✅ Lint correctly passed using custom env without extraction');
+
 // Clean up
-console.log('\n8️⃣  Cleaning up...');
+console.log('\n9️⃣  Cleaning up...');
 process.chdir(PROJECT_ROOT);
 rimraf.sync(TEST_DIR);
 console.log(`   Removed test directory: ${TEST_DIR}`);

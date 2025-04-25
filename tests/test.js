@@ -100,6 +100,185 @@ test('getCurrentBranch is working', () => {
   childProcess.execFileSync.restore();
 });
 
+// New test for environment variable branch specification
+test('getCurrentBranch uses environment variable when available', () => {
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup a mock environment
+    process.env = { ...originalEnv, GITHUB_REF: 'refs/heads/feature/test-branch' };
+    
+    const branchNameLint = new BranchNameLint();
+    // We should not need execFileSync at all
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // Verify branch name is extracted from GITHUB_REF
+    assert.strictEqual(name, 'feature/test-branch');
+    // execFileSync should not be called
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original process.env
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
+// New test for environment variable without refs/heads/ prefix
+test('getCurrentBranch handles environment variable without refs/heads/ prefix', () => {
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup a mock environment with direct branch name
+    process.env = { ...originalEnv, GITHUB_REF: 'feature/direct-branch' };
+    
+    const branchNameLint = new BranchNameLint();
+    // We should not need execFileSync at all
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // Verify branch name is used as is when no refs/heads/ prefix
+    assert.strictEqual(name, 'feature/direct-branch');
+    // execFileSync should not be called
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original process.env
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
+// New test for CLI option override
+test('getCurrentBranch uses CLI option when available', () => {
+  // Save original process.argv
+  const originalArgv = process.argv;
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup environment variable
+    process.env = { ...originalEnv, GITHUB_REF: 'refs/heads/feature/env-branch' };
+    // Setup CLI argument that should override env var
+    process.argv = [...originalArgv, '--branch', 'feature/cli-branch'];
+    
+    const branchNameLint = new BranchNameLint();
+    // We should not need execFileSync at all
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // CLI option should take precedence over environment variable
+    assert.strictEqual(name, 'feature/cli-branch');
+    // execFileSync should not be called
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original values
+    process.argv = originalArgv;
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
+// New test for custom environment variable name
+test('getCurrentBranch supports custom environment variable name', () => {
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup a mock environment with custom env var
+    process.env = { ...originalEnv, CUSTOM_BRANCH_ENV: 'feature/custom-env-branch' };
+    
+    const branchNameLint = new BranchNameLint({ branchEnvVariable: 'CUSTOM_BRANCH_ENV' });
+    // We should not need execFileSync at all
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // Verify custom environment variable is used
+    assert.strictEqual(name, 'feature/custom-env-branch');
+    // execFileSync should not be called
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original process.env
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
+// New tests for GITHUB_REF vs other environment variables
+test('getCurrentBranch extracts branch name from GITHUB_REF if it has refs/heads/ format', () => {
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup a mock environment with GitHub-style ref
+    process.env = { ...originalEnv, GITHUB_REF: 'refs/heads/feature/github-style-branch' };
+    
+    const branchNameLint = new BranchNameLint();
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // Verify branch name is extracted from refs/heads/ prefix
+    assert.strictEqual(name, 'feature/github-style-branch');
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original process.env
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
+test('getCurrentBranch does NOT extract from refs/heads/ if using custom env variable', () => {
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup a mock environment with GitHub-style ref but in a custom variable
+    process.env = { ...originalEnv, CUSTOM_VAR: 'refs/heads/should-not-extract' };
+    
+    const branchNameLint = new BranchNameLint({ branchEnvVariable: 'CUSTOM_VAR' });
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // Verify the whole string is used as is (no extraction)
+    assert.strictEqual(name, 'refs/heads/should-not-extract');
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original process.env
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
+test('getCurrentBranch uses direct branch name from GITHUB_REF if no refs/heads/ format', () => {
+  // Save original process.env
+  const originalEnv = process.env;
+  
+  try {
+    // Setup a mock environment with direct branch name in GITHUB_REF
+    process.env = { ...originalEnv, GITHUB_REF: 'feature/direct-branch' };
+    
+    const branchNameLint = new BranchNameLint();
+    const execStub = sinon.stub(childProcess, 'execFileSync');
+    
+    const name = branchNameLint.getCurrentBranch();
+    
+    // Verify branch name is used as is
+    assert.strictEqual(name, 'feature/direct-branch');
+    assert.strictEqual(execStub.called, false);
+  } finally {
+    // Restore original process.env
+    process.env = originalEnv;
+    sinon.restore();
+  }
+});
+
 test('doValidation is working', () => {
   sinon.stub(childProcess, 'execFileSync').returns('feature/valid-name');
   const branchNameLint = new BranchNameLint();

@@ -18,6 +18,7 @@ class BranchNameLint {
       msgPrefixSuggestion: 'Instead of "%s" try "%s".',
       msgseparatorRequired: 'Branch "%s" must contain a separator "%s".',
       msgDoesNotMatchRegex: 'Branch "%s" does not match the allowed pattern: "%s"',
+      branchEnvVariable: 'GITHUB_REF',
     };
 
     this.options = Object.assign(defaultOptions, options);
@@ -92,6 +93,26 @@ class BranchNameLint {
   }
 
   getCurrentBranch() {
+    // Check if specified as CLI argument via --branch
+    if (process.argv.includes('--branch')) {
+      const branchIndex = process.argv.indexOf('--branch');
+      if (branchIndex !== -1 && branchIndex + 1 < process.argv.length) {
+        return process.argv[branchIndex + 1].trim();
+      }
+    }
+    
+    // Check if branch is specified as an environment variable
+    if (this.options.branchEnvVariable && process.env[this.options.branchEnvVariable]) {
+      const envBranch = process.env[this.options.branchEnvVariable];
+      
+      // Only extract from refs/heads/ if the env variable is specifically GITHUB_REF
+      if (this.options.branchEnvVariable === 'GITHUB_REF' && envBranch.startsWith('refs/heads/')) {
+        return envBranch.replace('refs/heads/', '').trim();
+      }
+      return envBranch.trim();
+    }
+    
+    // Fall back to git command if no branch is specified via environment variable or CLI
     const branch = childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).toString();
     this.branch = branch;
     return this.branch.trim();
