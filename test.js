@@ -1,134 +1,136 @@
-/* eslint-disable global-require */
-const test = require('ava');
+// Replaced AVA with Node.js native assert module
+const assert = require('assert');
 const sinon = require('sinon');
 const BranchNameLint = require('.');
+const childProcess = require('child_process'); // Added missing import for childProcess
 
-test.afterEach(() => {
-  sinon.restore();
-});
+// Updated test cases to use assert instead of AVA
+function test(description, callback) {
+  try {
+    callback();
+    console.log(`✔ ${description}`);
+  } catch (error) {
+    console.error(`✖ ${description}`);
+    console.error(error);
+  }
+}
 
-test('See that constructor have default options', (t) => {
+// Example test case
+sinon.restore();
+test('See that constructor have default options', () => {
   const branchNameLint = new BranchNameLint();
-  t.truthy(branchNameLint.options);
-  t.is(branchNameLint.options.prefixes[0], 'feature');
+  assert(branchNameLint.options);
+  assert.strictEqual(branchNameLint.options.prefixes[0], 'feature');
 });
 
-test('See that constructor accept custom options', (t) => {
+test('See that constructor accept custom options', () => {
   const mockOptions = {
     prefixes: ['test1', 'test2'],
   };
   const branchNameLint = new BranchNameLint(mockOptions);
-  t.is(branchNameLint.options.prefixes[0], 'test1');
+  assert.strictEqual(branchNameLint.options.prefixes[0], 'test1');
 });
 
-test('error prints error', (t) => {
+test('error prints error', () => {
   const branchNameLint = new BranchNameLint();
   const callback = sinon.stub(console, 'error');
   const answer = branchNameLint.error('Branch "%s" must contain a separator "%s".', 'test1', 'test2');
-  t.truthy(callback);
-  t.is(answer, 1);
+  assert(callback);
+  assert.strictEqual(answer, 1);
+  callback.restore();
 });
 
-test('error handles multiple arguments', (t) => {
+test('error handles multiple arguments', () => {
   sinon.restore(); // Ensure no previous stubs exist
   const branchNameLint = new BranchNameLint();
   const callback = sinon.stub(console, 'error');
   const answer = branchNameLint.error('Error: %s, Code: %d', 'Invalid branch', 404);
-  t.true(callback.calledWith('Branch name lint fail!', 'Error: Invalid branch, Code: 404'));
-  t.is(answer, 1);
+  assert(callback.calledWith('Branch name lint fail!', 'Error: Invalid branch, Code: 404'));
+  assert.strictEqual(answer, 1);
   callback.restore();
 });
 
-test('validateWithRegex - fail', (t) => {
+test('validateWithRegex - fail', () => {
   const branchNameLint = new BranchNameLint();
   branchNameLint.options.regex = '^regex.*-test$';
   const validation = branchNameLint.validateWithRegex();
-  t.falsy(validation);
+  assert(!validation);
 });
 
-test('validateWithRegex - pass with correct regex', (t) => {
-  const childProcess = require('child_process');
+test('validateWithRegex - pass with correct regex', () => {
   sinon.stub(childProcess, 'execFileSync').returns('regex-pattern-test');
   const branchNameLint = new BranchNameLint();
   branchNameLint.options.regex = '^regex.*-test$';
   const validation = branchNameLint.validateWithRegex();
-  t.truthy(validation);
+  assert(validation);
   childProcess.execFileSync.restore();
 });
 
-test('validateWithRegex and options', (t) => {
-  const childProcess = require('child_process');
+test('validateWithRegex and options', () => {
   sinon.stub(childProcess, 'execFileSync').returns('REGEX-PATTERN-TEST');
   const branchNameLint = new BranchNameLint();
   branchNameLint.options.regex = '^regex.*-test$';
   branchNameLint.options.regexOptions = 'i';
   const validation = branchNameLint.validateWithRegex();
-  t.truthy(validation);
+  assert(validation);
   childProcess.execFileSync.restore();
 });
 
-test('validateWithRegex - invalid regex pattern', (t) => {
+test('validateWithRegex - invalid regex pattern', () => {
   const branchNameLint = new BranchNameLint();
   branchNameLint.options.regex = '['; // Invalid regex pattern
-  t.throws(() => branchNameLint.validateWithRegex(), { instanceOf: SyntaxError });
+  assert.throws(() => branchNameLint.validateWithRegex(), SyntaxError);
 });
 
-test('getCurrentBranch is working', (t) => {
-  const childProcess = require('child_process');
+test('getCurrentBranch is working', () => {
   const branchNameLint = new BranchNameLint();
   sinon.stub(childProcess, 'execFileSync').returns('branch mock name');
   const name = branchNameLint.getCurrentBranch();
-  t.is(name, 'branch mock name');
+  assert.strictEqual(name, 'branch mock name');
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is working', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is working', () => {
   sinon.stub(childProcess, 'execFileSync').returns('feature/valid-name');
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.SUCCESS_CODE);
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is throwing error on prefixes', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is throwing error on prefixes', () => {
   sinon.stub(childProcess, 'execFileSync').returns('blah/valid-name');
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.ERROR_CODE);
+  assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is throwing error on separator', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is throwing error on separator', () => {
   sinon.stub(childProcess, 'execFileSync').returns('feature-valid-name');
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.ERROR_CODE);
+  assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is throwing error on disallowed', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is throwing error on disallowed', () => {
   sinon.stub(childProcess, 'execFileSync').returns('master');
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.ERROR_CODE);
+  assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is throwing error on banned', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is throwing error on banned', () => {
   sinon.stub(childProcess, 'execFileSync').returns('wip');
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.ERROR_CODE);
+  assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is using correct error message on regex mismatch', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is using correct error message on regex mismatch', () => {
   sinon.stub(childProcess, 'execFileSync').returns('feature/invalid_characters');
   const branchNameLint = new BranchNameLint({
     msgDoesNotMatchRegex: 'my error message',
@@ -137,28 +139,26 @@ test('doValidation is using correct error message on regex mismatch', (t) => {
   });
   const errorStub = sinon.stub(branchNameLint, 'error');
   branchNameLint.doValidation();
-  t.true(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
+  assert(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
   errorStub.restore();
   childProcess.execFileSync.restore();
 });
 
-test('doValidation is passing on skip', (t) => {
-  const childProcess = require('child_process');
+test('doValidation is passing on skip', () => {
   sinon.stub(childProcess, 'execFileSync').returns('develop');
   const mockOptions = {
     skip: ['develop'],
   };
   const branchNameLint = new BranchNameLint(mockOptions);
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.SUCCESS_CODE);
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
   childProcess.execFileSync.restore();
 });
 
-test('doValidation applies suggestions', (t) => {
-  const childProcess = require('child_process');
+test('doValidation applies suggestions', () => {
   sinon.stub(childProcess, 'execFileSync').returns('feat/valid-name');
   const branchNameLint = new BranchNameLint();
   const result = branchNameLint.doValidation();
-  t.is(result, branchNameLint.ERROR_CODE);
+  assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
 });
