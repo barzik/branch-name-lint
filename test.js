@@ -3,6 +3,10 @@ const test = require('ava');
 const sinon = require('sinon');
 const BranchNameLint = require('.');
 
+test.afterEach(() => {
+  sinon.restore();
+});
+
 test('See that constructor have default options', (t) => {
   const branchNameLint = new BranchNameLint();
   t.truthy(branchNameLint.options);
@@ -23,6 +27,16 @@ test('error prints error', (t) => {
   const answer = branchNameLint.error('Branch "%s" must contain a separator "%s".', 'test1', 'test2');
   t.truthy(callback);
   t.is(answer, 1);
+});
+
+test('error handles multiple arguments', (t) => {
+  sinon.restore(); // Ensure no previous stubs exist
+  const branchNameLint = new BranchNameLint();
+  const callback = sinon.stub(console, 'error');
+  const answer = branchNameLint.error('Error: %s, Code: %d', 'Invalid branch', 404);
+  t.true(callback.calledWith('Branch name lint fail!', 'Error: Invalid branch, Code: 404'));
+  t.is(answer, 1);
+  callback.restore();
 });
 
 test('validateWithRegex - fail', (t) => {
@@ -51,6 +65,12 @@ test('validateWithRegex and options', (t) => {
   const validation = branchNameLint.validateWithRegex();
   t.truthy(validation);
   childProcess.execFileSync.restore();
+});
+
+test('validateWithRegex - invalid regex pattern', (t) => {
+  const branchNameLint = new BranchNameLint();
+  branchNameLint.options.regex = '['; // Invalid regex pattern
+  t.throws(() => branchNameLint.validateWithRegex(), { instanceOf: SyntaxError });
 });
 
 test('getCurrentBranch is working', (t) => {
@@ -113,7 +133,7 @@ test('doValidation is using correct error message on regex mismatch', (t) => {
   const branchNameLint = new BranchNameLint({
     msgDoesNotMatchRegex: 'my error message',
     regex: '^[a-z0-9/-]+$',
-    regexOptions: 'i'
+    regexOptions: 'i',
   });
   const errorStub = sinon.stub(branchNameLint, 'error');
   branchNameLint.doValidation();
@@ -131,5 +151,14 @@ test('doValidation is passing on skip', (t) => {
   const branchNameLint = new BranchNameLint(mockOptions);
   const result = branchNameLint.doValidation();
   t.is(result, branchNameLint.SUCCESS_CODE);
+  childProcess.execFileSync.restore();
+});
+
+test('doValidation applies suggestions', (t) => {
+  const childProcess = require('child_process');
+  sinon.stub(childProcess, 'execFileSync').returns('feat/valid-name');
+  const branchNameLint = new BranchNameLint();
+  const result = branchNameLint.doValidation();
+  t.is(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
 });
