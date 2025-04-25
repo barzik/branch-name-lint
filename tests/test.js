@@ -7,6 +7,9 @@ const fs = require('fs');
 const BranchNameLint = require('..');
 const childProcess = require('child_process'); // Added missing import for childProcess
 
+// Track failed tests to exit with proper code
+let failedTests = 0;
+
 // Updated test cases to use assert instead of AVA
 function test(description, callback) {
   try {
@@ -15,6 +18,7 @@ function test(description, callback) {
   } catch (error) {
     console.error(`✖ ${description}`);
     console.error(error);
+    failedTests++; // Increment failed test counter
   }
 }
 
@@ -222,4 +226,14 @@ test('JavaScript configuration supports importing constants', () => {
   assert.strictEqual(jsConfig.suggestions.feat, 'feature');
   assert(Array.isArray(jsConfig.banned));
   assert(jsConfig.banned.includes('wip'));
+});
+
+// Exit with non-zero status code if any tests failed
+process.on('exit', () => {
+  if (failedTests > 0) {
+    console.error(`\n${failedTests} test(s) failed`);
+    process.exit(1);
+  } else {
+    console.log('\nAll tests passed!');
+  }
 });
