@@ -202,7 +202,7 @@ if (!badEnvVarResult.success) {
 
 // Test with a valid branch name via environment variable
 console.log('\n   Testing branchNameEnvVariable with a valid branch name:');
-runCommand(`TEST_BRANCH_NAME=feature/valid-env-branch npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`);
+runCommand(`export TEST_BRANCH_NAME=feature/valid-env-branch npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`);
 console.log('   ✅ Lint correctly passed for valid branch name provided via environment variable');
 
 // Clean up
