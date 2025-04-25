@@ -10,12 +10,16 @@ const ALL_PREFIXES = [...COMMON_PREFIXES, ...CI_PREFIXES];
 
 // Export the configuration object
 module.exports = {
+  // Set prefixes to false to disable prefix check
+  // prefixes: false,
   prefixes: ALL_PREFIXES,
   suggestions: {
     feat: 'feature'
   },
   banned: ['wip', 'tmp'],
   skip: ['develop', 'master', 'main'],
+  // Set separator to false to disable separator check
+  // separator: false,
   separator: '/',
   disallowed: ['master', 'develop', 'main'],
   regex: '^[a-z0-9/-]+$',

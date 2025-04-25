@@ -9,7 +9,8 @@
  * 4. Testing with a bad branch name (should fail)
  * 5. Testing with a good branch name (should pass)
  * 6. Testing with JavaScript configuration file
- * 7. Cleaning up the test directory
+ * 7. Testing with disabled separator and prefix checks
+ * 8. Cleaning up the test directory
  */
 
 const fs = require('fs');
@@ -22,8 +23,10 @@ const TEST_DIR = path.join(__dirname, 'e2e-test-dir');
 const GOOD_BRANCH_NAME = 'feature/valid-branch';
 const BAD_BRANCH_NAME = 'invalid-branch';
 const CI_BRANCH_NAME = 'ci/build-test'; // For testing JS config with extra prefixes
+const NO_SEPARATOR_BRANCH = 'anyprefix-no-separator'; // For testing disabled separator check
 const JSON_CONFIG_PATH = path.join(__dirname, 'sample-configuration.json');
 const JS_CONFIG_PATH = path.join(__dirname, 'sample-configuration.js');
+const DISABLED_CONFIG_PATH = path.join(TEST_DIR, 'disabled-config.json');
 const PROJECT_ROOT = path.join(__dirname, '..');
 
 // Utility function to execute commands with better error handling
@@ -128,8 +131,32 @@ if (!badWithJsResult.success) {
   process.exit(1);
 }
 
+// Test with disabled separator and prefix checks
+console.log('\n7️⃣  Testing with disabled separator and prefix checks...');
+
+// Create a configuration file with disabled separator and prefix checks
+const disabledConfig = {
+  branchNameLinter: {
+    prefixes: false,
+    separator: false,
+    regex: ".*" // Use a permissive regex pattern that allows any string
+  }
+};
+
+fs.writeFileSync(DISABLED_CONFIG_PATH, JSON.stringify(disabledConfig, null, 2));
+console.log(`   Created disabled configuration at: ${DISABLED_CONFIG_PATH}`);
+
+// Create a branch without separator - this would normally fail but should pass with disabled checks
+runCommand(`git checkout -b ${NO_SEPARATOR_BRANCH}`);
+console.log(`   Created branch without separator: ${NO_SEPARATOR_BRANCH}`);
+
+// Run branch-name-lint with disabled config - should pass despite no separator and invalid prefix
+console.log('\n   Running branch-name-lint with disabled checks - expecting success:');
+runCommand(`npx branch-name-lint ${DISABLED_CONFIG_PATH}`);
+console.log('   ✅ Lint correctly passed for branch with disabled checks');
+
 // Clean up
-console.log('\n7️⃣  Cleaning up...');
+console.log('\n8️⃣  Cleaning up...');
 process.chdir(PROJECT_ROOT);
 rimraf.sync(TEST_DIR);
 console.log(`   Removed test directory: ${TEST_DIR}`);
