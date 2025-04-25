@@ -18,11 +18,12 @@ $ npx branch-name-lint
 $ npx branch-name-lint --help
 
   Usage
-    npx branch-name-lint [configfileLocation JSON]
+    npx branch-name-lint [configfileLocation JSON|JS]
 
   Examples
     $ branch-name-lint
     $ branch-name-lint config-file.json
+    $ branch-name-lint config-file.js
 ```
 
 ### CLI options.json
@@ -64,6 +65,33 @@ Any Valid JSON file with `branchNameLinter` attribute.
 }
 ```
 
+### CLI options.js
+
+You can also use a JavaScript file for configuration, which allows for more dynamic configuration with variables and imports:
+
+```js
+// config-file.js
+// Define constants that can be reused 
+const COMMON_PREFIXES = ['feature', 'bugfix', 'hotfix', 'release'];
+const CI_PREFIXES = ['ci', 'build'];
+
+// Combine arrays for configuration
+const ALL_PREFIXES = [...COMMON_PREFIXES, ...CI_PREFIXES];
+
+// Export the configuration object
+module.exports = {
+  prefixes: ALL_PREFIXES,
+  suggestions: {
+    feat: 'feature'
+  },
+  banned: ['wip', 'tmp'],
+  skip: ['develop', 'master', 'main'],
+  separator: '/',
+  disallowed: ['master', 'develop', 'main'],
+  // other options...
+};
+```
+
 ## Usage with regex
 
 In order to check the branch name with a regex you can add a a regex as a string under the branchNameLinter in your config JSON. You can also pass any options for the regex (e.g. case insensitive: 'i')
@@ -87,6 +115,16 @@ After installation, just add in any husky hook as node modules call.
 "husky": {
     "hooks": {
         "pre-push": "npx branch-name-lint [sample-configuration.json]"
+    }
+},
+```
+
+Or with a JavaScript configuration file:
+
+```
+"husky": {
+    "hooks": {
+        "pre-push": "npx branch-name-lint [sample-configuration.js]"
     }
 },
 ```

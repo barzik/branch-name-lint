@@ -17,15 +17,15 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm test && node ./bin/branch-name-lint sample-configuration.json"
+      "pre-push": "npm test && node ./bin/branch-name-lint tests/sample-configuration.json"
     }
   },
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "test": "node test.js && npm run e2e",
-    "e2e": "node ./e2e-test.js",
+    "test": "node tests/test.js && npm run e2e",
+    "e2e": "node ./tests/e2e-test.js",
     "prepack": "npm prune --production && del package-lock.json && npm shrinkwrap",
     "postpack": "git checkout package-lock.json && git clean -f npm-shrinkwrap.json",
     "release": "npm publish",
