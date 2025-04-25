@@ -26,6 +26,9 @@ jobs:
     name: Branch Lint Name ${{ matrix.node_version }} - ${{ matrix.architecture }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+      # Add branch name linting step using GITHUB_REF (default value)
+      - name: Lint branch name
+        run: echo ${{GITHUB_HEAD_REF}}
       - name: Setup node
         uses: actions/setup-node@v2
         with:
@@ -34,7 +37,5 @@ jobs:
       - run: npm install
       - run: npm test
       
-      # Add branch name linting step using GITHUB_REF (default value)
-      - name: Lint branch name
-        run: echo ${GITHUB_HEAD_REF}
+
 
