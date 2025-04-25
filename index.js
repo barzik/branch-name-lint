@@ -88,7 +88,9 @@ class BranchNameLint {
   }
 
   error() {
+    /* eslint-disable no-console */
     console.error('Branch name lint fail!', Reflect.apply(util.format, null, arguments)); // eslint-disable-line prefer-rest-params
+    /* eslint-enable no-console */
     return this.ERROR_CODE;
   }
 }
