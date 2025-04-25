@@ -101,8 +101,9 @@ class BranchNameLint {
       }
     }
     
-    // Check if branch is specified via the configured environment variable
-    if (this.options.branchEnvVariable && process.env[this.options.branchEnvVariable]) {
+    // Only check for environment variable if branchEnvVariable is explicitly provided in options
+    // This maintains backward compatibility with existing behavior
+    if (this.options.branchEnvVariable !== undefined && process.env[this.options.branchEnvVariable]) {
       let branchName = process.env[this.options.branchEnvVariable].trim();
       
       // Special handling for GITHUB_REF to extract branch name from refs/heads/ format

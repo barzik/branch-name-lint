@@ -68,22 +68,44 @@ test('validateWithRegex - fail', () => {
 });
 
 test('validateWithRegex - pass with correct regex', () => {
-  sinon.stub(childProcess, 'execFileSync').returns('regex-pattern-test');
-  const branchNameLint = new BranchNameLint();
-  branchNameLint.options.regex = '^regex.*-test$';
-  const validation = branchNameLint.validateWithRegex();
-  assert(validation);
-  childProcess.execFileSync.restore();
+  // Save original environment to restore later
+  const originalEnv = process.env;
+  try {
+    // Clear environment variables for this test
+    process.env = {};
+    
+    sinon.stub(childProcess, 'execFileSync').returns('regex-pattern-test');
+    const branchNameLint = new BranchNameLint();
+    branchNameLint.branch = 'regex-pattern-test'; // Explicitly set branch
+    branchNameLint.options.regex = '^regex.*-test$';
+    const validation = branchNameLint.validateWithRegex();
+    assert(validation);
+  } finally {
+    // Restore environment
+    process.env = originalEnv;
+    sinon.restore();
+  }
 });
 
 test('validateWithRegex and options', () => {
-  sinon.stub(childProcess, 'execFileSync').returns('REGEX-PATTERN-TEST');
-  const branchNameLint = new BranchNameLint();
-  branchNameLint.options.regex = '^regex.*-test$';
-  branchNameLint.options.regexOptions = 'i';
-  const validation = branchNameLint.validateWithRegex();
-  assert(validation);
-  childProcess.execFileSync.restore();
+  // Save original environment to restore later
+  const originalEnv = process.env;
+  try {
+    // Clear environment variables for this test
+    process.env = {};
+    
+    sinon.stub(childProcess, 'execFileSync').returns('REGEX-PATTERN-TEST');
+    const branchNameLint = new BranchNameLint();
+    branchNameLint.branch = 'REGEX-PATTERN-TEST'; // Explicitly set branch
+    branchNameLint.options.regex = '^regex.*-test$';
+    branchNameLint.options.regexOptions = 'i';
+    const validation = branchNameLint.validateWithRegex();
+    assert(validation);
+  } finally {
+    // Restore environment
+    process.env = originalEnv;
+    sinon.restore();
+  }
 });
 
 test('validateWithRegex - invalid regex pattern', () => {
@@ -93,11 +115,22 @@ test('validateWithRegex - invalid regex pattern', () => {
 });
 
 test('getCurrentBranch is working', () => {
-  const branchNameLint = new BranchNameLint();
-  sinon.stub(childProcess, 'execFileSync').returns('branch mock name');
-  const name = branchNameLint.getCurrentBranch();
-  assert.strictEqual(name, 'branch mock name');
-  childProcess.execFileSync.restore();
+  // Save original environment to restore later
+  const originalEnv = process.env;
+  
+  try {
+    // Clear environment variables for this test
+    process.env = {};
+    
+    const branchNameLint = new BranchNameLint();
+    sinon.stub(childProcess, 'execFileSync').returns('branch mock name');
+    const name = branchNameLint.getCurrentBranch();
+    assert.strictEqual(name, 'branch mock name');
+  } finally {
+    // Restore environment
+    process.env = originalEnv;
+    sinon.restore();
+  }
 });
 
 // New test for environment variable branch specification
@@ -280,11 +313,22 @@ test('getCurrentBranch uses direct branch name from GITHUB_REF if no refs/heads/
 });
 
 test('doValidation is working', () => {
-  sinon.stub(childProcess, 'execFileSync').returns('feature/valid-name');
-  const branchNameLint = new BranchNameLint();
-  const result = branchNameLint.doValidation();
-  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
-  childProcess.execFileSync.restore();
+  // Save original environment to restore later
+  const originalEnv = process.env;
+  
+  try {
+    // Clear environment variables for this test
+    process.env = {};
+    
+    sinon.stub(childProcess, 'execFileSync').returns('feature/valid-name');
+    const branchNameLint = new BranchNameLint();
+    const result = branchNameLint.doValidation();
+    assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
+  } finally {
+    // Restore environment
+    process.env = originalEnv;
+    sinon.restore();
+  }
 });
 
 test('doValidation is throwing error on prefixes', () => {
