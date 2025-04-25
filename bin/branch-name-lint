@@ -11,19 +11,34 @@ const cli = meow(`
 	  $ npx branch-name-lint [configuration-file.json|configuration-file.js]
 
 	Options
-	  --help - to get this screen
+	  --help  - to get this screen
+	  --branch - specify a custom branch name to check instead of the current git branch
 
 	Examples
 	  $ branch-name-lint
 	  Use default configutation or the configuration specified in package.json to validate & lint the branch name.
 	  $ branch-name-lint [configuration-file.json|configuration-file.js]
 	  Use configutation file to validate & lint the branch name.
-`);
+	  $ branch-name-lint --branch feature/my-new-feature
+	  Validate a specific branch name.
+`, {
+	flags: {
+		branch: {
+			type: 'string'
+		}
+	}
+});
 const configFileName = cli.input[0];
 
 class BranchNameLintCli {
 	constructor() {
 		this.options = this.loadConfiguration(configFileName);
+		
+		// Apply command line branch option if provided
+		if (cli.flags.branch) {
+			this.options.branch = cli.flags.branch;
+		}
+		
 		const branchNameLint = new BranchNameLint(this.options);
 		const answer = branchNameLint.doValidation();
 		if (answer === 1) {

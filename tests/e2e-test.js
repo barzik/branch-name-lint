@@ -10,7 +10,9 @@
  * 5. Testing with a good branch name (should pass)
  * 6. Testing with JavaScript configuration file
  * 7. Testing with disabled separator and prefix checks
- * 8. Cleaning up the test directory
+ * 8. Testing with --branch CLI option
+ * 9. Testing with branchNameEnvVariable configuration
+ * 10. Cleaning up the test directory
  */
 
 const fs = require('fs');
@@ -27,6 +29,7 @@ const NO_SEPARATOR_BRANCH = 'anyprefix-no-separator'; // For testing disabled se
 const JSON_CONFIG_PATH = path.join(__dirname, 'sample-configuration.json');
 const JS_CONFIG_PATH = path.join(__dirname, 'sample-configuration.js');
 const DISABLED_CONFIG_PATH = path.join(TEST_DIR, 'disabled-config.json');
+const ENV_VAR_CONFIG_PATH = path.join(TEST_DIR, 'env-var-config.json'); // For testing branchNameEnvVariable
 const PROJECT_ROOT = path.join(__dirname, '..');
 
 // Utility function to execute commands with better error handling
@@ -155,8 +158,55 @@ console.log('\n   Running branch-name-lint with disabled checks - expecting succ
 runCommand(`npx branch-name-lint ${DISABLED_CONFIG_PATH}`);
 console.log('   ✅ Lint correctly passed for branch with disabled checks');
 
+// Test with --branch CLI option
+console.log('\n8️⃣  Testing with --branch CLI option...');
+
+// Test with an invalid branch name via CLI (should be on a valid git branch now)
+console.log('\n   Testing --branch with an invalid branch name:');
+const badCliResult = runCommand(`npx branch-name-lint ${JSON_CONFIG_PATH} --branch invalid-cli-branch`, { expectError: true });
+if (!badCliResult.success) {
+  console.log('   ✅ Lint correctly failed for invalid branch name provided via --branch');
+} else {
+  console.error('   ❌ Lint unexpectedly passed for invalid branch name provided via --branch');
+  process.exit(1);
+}
+
+// Test with a valid branch name via CLI
+console.log('\n   Testing --branch with a valid branch name:');
+runCommand(`npx branch-name-lint ${JSON_CONFIG_PATH} --branch feature/valid-cli-branch`);
+console.log('   ✅ Lint correctly passed for valid branch name provided via --branch');
+
+// Test with branchNameEnvVariable configuration
+console.log('\n9️⃣  Testing with branchNameEnvVariable configuration...');
+
+// Create a configuration file that specifies an environment variable
+const envVarConfig = {
+  branchNameLinter: {
+    branchNameEnvVariable: "TEST_BRANCH_NAME",
+    prefixes: ["feature", "hotfix", "release"]
+  }
+};
+
+fs.writeFileSync(ENV_VAR_CONFIG_PATH, JSON.stringify(envVarConfig, null, 2));
+console.log(`   Created environment variable configuration at: ${ENV_VAR_CONFIG_PATH}`);
+
+// Test with an invalid branch name via environment variable
+console.log('\n   Testing branchNameEnvVariable with an invalid branch name:');
+const badEnvVarResult = runCommand(`TEST_BRANCH_NAME=invalid-env-branch npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`, { expectError: true });
+if (!badEnvVarResult.success) {
+  console.log('   ✅ Lint correctly failed for invalid branch name provided via environment variable');
+} else {
+  console.error('   ❌ Lint unexpectedly passed for invalid branch name provided via environment variable');
+  process.exit(1);
+}
+
+// Test with a valid branch name via environment variable
+console.log('\n   Testing branchNameEnvVariable with a valid branch name:');
+runCommand(`TEST_BRANCH_NAME=feature/valid-env-branch npx branch-name-lint ${ENV_VAR_CONFIG_PATH}`);
+console.log('   ✅ Lint correctly passed for valid branch name provided via environment variable');
+
 // Clean up
-console.log('\n8️⃣  Cleaning up...');
+console.log('\n🔟  Cleaning up...');
 process.chdir(PROJECT_ROOT);
 rimraf.sync(TEST_DIR);
 console.log(`   Removed test directory: ${TEST_DIR}`);

@@ -20,10 +20,15 @@ $ npx branch-name-lint --help
   Usage
     npx branch-name-lint [configfileLocation JSON|JS]
 
+  Options
+    --help   - to get this screen
+    --branch - specify a custom branch name to check instead of the current git branch
+
   Examples
     $ branch-name-lint
     $ branch-name-lint config-file.json
     $ branch-name-lint config-file.js
+    $ branch-name-lint --branch feature/my-new-feature
 ```
 
 ### CLI options.json
@@ -43,7 +48,7 @@ Any Valid JSON file with `branchNameLinter` attribute.
             "feat": "feature",
             "fix": "hotfix",
             "releases": "release"
-        },
+        ],
         "banned": [
             "wip"
         ],
@@ -56,6 +61,8 @@ Any Valid JSON file with `branchNameLinter` attribute.
             "staging"
         ],
         "separator": "/",
+        "branchNameEnvVariable": false,
+        "branch": false,
         "msgBranchBanned": "Branches with the name \"%s\" are not allowed.",
         "msgBranchDisallowed": "Pushing to \"%s\" is not allowed, use git-flow.",
         "msgPrefixNotAllowed": "Branch prefix \"%s\" is not allowed.",
@@ -64,6 +71,40 @@ Any Valid JSON file with `branchNameLinter` attribute.
     }
 }
 ```
+
+### Specifying a Custom Branch Name
+
+You can specify a custom branch name to validate instead of using the current git branch in two ways:
+
+1. Using the CLI flag:
+   ```
+   $ npx branch-name-lint --branch feature/my-custom-branch
+   ```
+
+2. Using configuration:
+   ```json
+   {
+     "branchNameLinter": {
+       "branch": "feature/my-custom-branch"
+     }
+   }
+   ```
+
+3. Using an environment variable:
+   ```json
+   {
+     "branchNameLinter": {
+       "branchNameEnvVariable": "CI_BRANCH_NAME"
+     }
+   }
+   ```
+
+   Then set the environment variable:
+   ```
+   CI_BRANCH_NAME=feature/my-custom-branch npx branch-name-lint
+   ```
+
+This is useful for CI/CD environments where you might want to validate branch names from environment variables.
 
 ### Disabling Checks
 

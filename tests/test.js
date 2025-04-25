@@ -260,6 +260,116 @@ test('JavaScript configuration supports importing constants', () => {
   assert(jsConfig.banned.includes('wip'));
 });
 
+// Add tests for the new branch name features
+test('getCurrentBranch uses the provided branch option if available', () => {
+  const branchNameLint = new BranchNameLint({
+    branch: 'feature/custom-branch-option'
+  });
+  
+  // Make sure execFileSync is stubbed so we know it's not calling git
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  execStub.returns('this-should-not-be-used');
+  
+  const name = branchNameLint.getCurrentBranch();
+  assert.strictEqual(name, 'feature/custom-branch-option');
+  
+  // Verify that execFileSync wasn't called since we provided a branch name
+  assert(execStub.notCalled);
+  execStub.restore();
+});
+
+test('getCurrentBranch uses the environment variable if branchNameEnvVariable is set', () => {
+  // Save the original process.env
+  const originalEnv = process.env;
+  
+  // Set up a test environment variable
+  process.env = {
+    ...originalEnv,
+    TEST_BRANCH_NAME: 'feature/from-env-var'
+  };
+  
+  const branchNameLint = new BranchNameLint({
+    branchNameEnvVariable: 'TEST_BRANCH_NAME'
+  });
+  
+  // Make sure execFileSync is stubbed so we know it's not calling git
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  execStub.returns('this-should-not-be-used');
+  
+  const name = branchNameLint.getCurrentBranch();
+  assert.strictEqual(name, 'feature/from-env-var');
+  
+  // Verify that execFileSync wasn't called since we used the env var
+  assert(execStub.notCalled);
+  
+  // Restore the original process.env and stub
+  process.env = originalEnv;
+  execStub.restore();
+});
+
+test('getCurrentBranch respects option priority: branch > branchNameEnvVariable > git', () => {
+  // Save the original process.env
+  const originalEnv = process.env;
+  
+  // Set up a test environment variable
+  process.env = {
+    ...originalEnv,
+    TEST_BRANCH_NAME: 'feature/from-env-var'
+  };
+  
+  // Create with both branch and branchNameEnvVariable set
+  const branchNameLint = new BranchNameLint({
+    branch: 'feature/from-option',
+    branchNameEnvVariable: 'TEST_BRANCH_NAME'
+  });
+  
+  // Make sure execFileSync is stubbed so we know it's not calling git
+  const execStub = sinon.stub(childProcess, 'execFileSync');
+  execStub.returns('feature/from-git');
+  
+  const name = branchNameLint.getCurrentBranch();
+  
+  // Should use the branch option, not the env var or git
+  assert.strictEqual(name, 'feature/from-option');
+  
+  // Verify that execFileSync wasn't called
+  assert(execStub.notCalled);
+  
+  // Restore the original process.env and stub
+  process.env = originalEnv;
+  execStub.restore();
+});
+
+test('doValidation works with custom branch name from option', () => {
+  // No need to stub execFileSync as it shouldn't be called
+  const branchNameLint = new BranchNameLint({
+    branch: 'feature/valid-from-option'
+  });
+  
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
+});
+
+test('doValidation rejects invalid custom branch name from option', () => {
+  // No need to stub execFileSync as it shouldn't be called
+  const branchNameLint = new BranchNameLint({
+    branch: 'invalid-branch-name'
+  });
+  
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.ERROR_CODE);
+});
+
+test('branchNameEnvVariable defaults to false', () => {
+  const branchNameLint = new BranchNameLint();
+  assert.strictEqual(branchNameLint.options.branchNameEnvVariable, false);
+});
+
+test('branch option defaults to false', () => {
+  const branchNameLint = new BranchNameLint();
+  assert.strictEqual(branchNameLint.options.branch, false);
+});
+
 // Exit with non-zero status code if any tests failed
 process.on('exit', () => {
   if (failedTests > 0) {
