@@ -36,6 +36,7 @@ jobs:
       
       # Add branch name linting step using GITHUB_REF (default value)
       - name: Lint branch name
+        run: echo running on branch ${GITHUB_REF##*/}
         run: npx branch-name-lint
         env:
           GITHUB_REF: ${{ github.ref }}
