@@ -18,9 +18,9 @@ jobs:
           - macos-latest
           - windows-latest
         node_version:
-          - 10
-          - 12
-          - 14
+          - 18
+          - 20
+          - 22
         architecture:
           - x64
     name: Branch Lint Name ${{ matrix.node_version }} - ${{ matrix.architecture }} on ${{ matrix.os }}
