@@ -24,15 +24,14 @@ $ npx branch-name-lint --help
     --help             - to get this screen
     --branch <name>    - specify branch name manually (overrides environment variable)
 
-  Environment Variables
-    GITHUB_REF         - can be used to specify branch name (e.g., refs/heads/feature-branch-1)
+  Environment Variables Configuration
+    branchEnvVariable  - optional configure which environment variable to use (defaults to GITHUB_REF)
 
   Examples
     $ branch-name-lint
     $ branch-name-lint config-file.json
     $ branch-name-lint config-file.js
     $ branch-name-lint --branch feature/my-branch
-    $ GITHUB_REF=refs/heads/feature/my-branch branch-name-lint
 ```
 
 ### CLI options.json
@@ -65,6 +64,7 @@ Any Valid JSON file with `branchNameLinter` attribute.
             "staging"
         ],
         "separator": "/",
+        "branchEnvVariable": "GITHUB_REF", // specify environment variable name to use
         "msgBranchBanned": "Branches with the name \"%s\" are not allowed.",
         "msgBranchDisallowed": "Pushing to \"%s\" is not allowed, use git-flow.",
         "msgPrefixNotAllowed": "Branch prefix \"%s\" is not allowed.",
@@ -92,7 +92,7 @@ When `prefixes` is set to `false`, any branch prefix will be allowed. When `sepa
 
 ### Branch Name Environment Variable
 
-You can specify a branch name using environment variables:
+You can specify which environment variable to use for the branch name using the `branchEnvVariable` option:
 
 ```
 {
@@ -103,24 +103,26 @@ You can specify a branch name using environment variables:
 }
 ```
 
-By default, the tool looks for the `GITHUB_REF` environment variable. When using the `GITHUB_REF` environment variable specifically, the tool automatically extracts the branch name from GitHub-style refs format (e.g., `refs/heads/feature-branch-1` will be converted to `feature-branch-1`).
+By default, the tool looks for the `GITHUB_REF` environment variable.
 
-If you use a custom environment variable name (not `GITHUB_REF`), the tool will use the exact value without any extraction:
+Special handling for `GITHUB_REF`:
+- When using specifically the `GITHUB_REF` environment variable, the tool automatically extracts the branch name from GitHub-style refs format (e.g., `refs/heads/feature-branch-1` will be converted to `feature-branch-1`).
+- This is useful in GitHub Actions workflows where the branch name is available in this format.
 
 ```bash
-# Using GITHUB_REF - extracts branch name automatically
-GITHUB_REF=refs/heads/feature/branch npx branch-name-lint
-# Branch name will be "feature/branch"
+# Using GITHUB_REF with refs/heads/ format - branch name is automatically extracted
+GITHUB_REF=refs/heads/feature/my-branch npx branch-name-lint
+# Branch name will be "feature/my-branch"
 
-# Using custom environment variable - uses exact value
-MY_CUSTOM_VAR=refs/heads/feature/branch npx branch-name-lint
-# Branch name will be "refs/heads/feature/branch"
+# Using a custom environment variable
+MY_VAR=feature/my-branch npx branch-name-lint
+# Requires branchEnvVariable: "MY_VAR" in configuration
 ```
 
 You can override any environment variable using the `--branch` command line option:
 
 ```bash
-# CLI option takes precedence
+# CLI option takes precedence over environment variables
 GITHUB_REF=refs/heads/feature1 npx branch-name-lint --branch feature/cli-branch
 # Branch name will be "feature/cli-branch"
 ```
@@ -148,7 +150,7 @@ module.exports = {
   skip: ['develop', 'master', 'main'],
   separator: '/', // Set to false to disable separator check
   disallowed: ['master', 'develop', 'main'],
-  branchEnvVariable: 'GITHUB_REF', // Name of environment variable to use for branch name
+  branchEnvVariable: 'MY_BRANCH_ENV', // Name of environment variable to use for branch name
   // other options...
 };
 ```
@@ -192,16 +194,32 @@ Or with a JavaScript configuration file:
 
 ## CI usage
 
-In CI environments like GitHub Actions, you can use environment variables to specify the branch name:
+In CI environments like GitHub Actions, you can use the default `GITHUB_REF` environment variable which is automatically available:
 
 ```yaml
 - name: Lint branch name
   run: npx branch-name-lint
-  env:
-    GITHUB_REF: ${{ github.ref }}
 ```
 
-The `GITHUB_REF` environment variable is already available in GitHub Actions, so you don't need to set it explicitly. The tool will automatically extract the branch name from the `refs/heads/branch-name` format.
+GitHub Actions automatically sets the `GITHUB_REF` environment variable to the full reference path (e.g., `refs/heads/feature/branch-name`), and the tool will automatically extract the branch name part.
+
+If you want to use a different environment variable, you can configure it in your linter configuration and set the environment variable:
+
+```yaml
+- name: Lint branch name with custom environment variable
+  run: npx branch-name-lint config.json
+  env:
+    CUSTOM_BRANCH: ${{ github.head_ref || github.ref_name }}
+```
+
+With `config.json` containing:
+```json
+{
+  "branchNameLinter": {
+    "branchEnvVariable": "CUSTOM_BRANCH"
+  }
+}
+```
 
 ## Usage in Node.js
 

@@ -101,15 +101,16 @@ class BranchNameLint {
       }
     }
     
-    // Check if branch is specified as an environment variable
+    // Check if branch is specified via the configured environment variable
     if (this.options.branchEnvVariable && process.env[this.options.branchEnvVariable]) {
-      const envBranch = process.env[this.options.branchEnvVariable];
+      let branchName = process.env[this.options.branchEnvVariable].trim();
       
-      // Only extract from refs/heads/ if the env variable is specifically GITHUB_REF
-      if (this.options.branchEnvVariable === 'GITHUB_REF' && envBranch.startsWith('refs/heads/')) {
-        return envBranch.replace('refs/heads/', '').trim();
+      // Special handling for GITHUB_REF to extract branch name from refs/heads/ format
+      if (this.options.branchEnvVariable === 'GITHUB_REF' && branchName.startsWith('refs/heads/')) {
+        branchName = branchName.replace('refs/heads/', '');
       }
-      return envBranch.trim();
+      
+      return branchName;
     }
     
     // Fall back to git command if no branch is specified via environment variable or CLI

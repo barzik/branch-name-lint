@@ -15,7 +15,10 @@ const cli = meow(`
 	  --branch <name>    - specify branch name manually (overrides environment variable)
 
 	Environment Variables
-	  GITHUB_REF         - can be used to specify branch name (e.g., refs/heads/feature-branch-1)
+	  GITHUB_REF         - used by default, automatically extracts branch name from refs/heads/ format
+
+	Configuration
+	  branchEnvVariable  - configure which environment variable to use (defaults to GITHUB_REF)
 
 	Examples
 	  $ branch-name-lint
@@ -24,8 +27,10 @@ const cli = meow(`
 	  Use configutation file to validate & lint the branch name.
 	  $ branch-name-lint --branch feature/my-branch
 	  Lint a specific branch name instead of the current git branch.
-	  $ GITHUB_REF=refs/heads/feature/my-branch branch-name-lint
-	  Use branch name from environment variable.
+	  $ GITHUB_REF=refs/heads/feature-branch-1 branch-name-lint
+	  Use branch name from GITHUB_REF (automatically extracts from refs/heads/).
+	  $ MY_CUSTOM_VAR=feature/my-branch branch-name-lint config-with-custom-var.json
+	  Use a custom environment variable (requires "branchEnvVariable": "MY_CUSTOM_VAR" in config).
 `);
 const configFileName = cli.input[0];
 

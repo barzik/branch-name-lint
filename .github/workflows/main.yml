@@ -34,7 +34,7 @@ jobs:
       - run: npm install
       - run: npm test
       
-      # Add branch name linting step using environment variable feature
+      # Add branch name linting step using GITHUB_REF (default value)
       - name: Lint branch name
         run: npx branch-name-lint
         env:
