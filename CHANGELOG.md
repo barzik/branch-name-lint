@@ -5,8 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [3.0.0] - 2025-04-25
 ### Fixed
 - Fix incorrect error message upon regex validation failure.
+- Added option for custom branch name
+- Added e2e and more testing
+- Removed old shrinkwrap
+- Better output validation
+- Cleaning npm audit results
 
 ## [2.1.0] - 2021-06-11
 ### Added
