@@ -65,6 +65,22 @@ Any Valid JSON file with `branchNameLinter` attribute.
 }
 ```
 
+### Disabling Checks
+
+You can disable prefix or separator checks by setting their respective configuration values to `false`:
+
+```
+{
+    "branchNameLinter": {
+        "prefixes": false,  // Disables the prefix validation check
+        "separator": false, // Disables the separator validation check
+        "regex": "^(revert|master|develop|issue|release|hotfix/|feature/|support/|shift-)"
+    }
+}
+```
+
+When `prefixes` is set to `false`, any branch prefix will be allowed. When `separator` is set to `false`, branches without separators will be allowed.
+
 ### CLI options.js
 
 You can also use a JavaScript file for configuration, which allows for more dynamic configuration with variables and imports:
@@ -80,13 +96,13 @@ const ALL_PREFIXES = [...COMMON_PREFIXES, ...CI_PREFIXES];
 
 // Export the configuration object
 module.exports = {
-  prefixes: ALL_PREFIXES,
+  prefixes: ALL_PREFIXES, // Set to false to disable prefix check
   suggestions: {
     feat: 'feature'
   },
   banned: ['wip', 'tmp'],
   skip: ['develop', 'master', 'main'],
-  separator: '/',
+  separator: '/', // Set to false to disable separator check
   disallowed: ['master', 'develop', 'main'],
   // other options...
 };

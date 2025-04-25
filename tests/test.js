@@ -10,16 +10,20 @@ const childProcess = require('child_process'); // Added missing import for child
 // Updated test cases to use assert instead of AVA
 function test(description, callback) {
   try {
+    // Make sure to restore sinon stubs before each test
+    sinon.restore();
     callback();
     console.log(`✔ ${description}`);
   } catch (error) {
     console.error(`✖ ${description}`);
     console.error(error);
+  } finally {
+    // Ensure stubs are restored after each test
+    sinon.restore();
   }
 }
 
 // Example test case
-sinon.restore();
 test('See that constructor have default options', () => {
   const branchNameLint = new BranchNameLint();
   assert(branchNameLint.options);
@@ -44,7 +48,6 @@ test('error prints error', () => {
 });
 
 test('error handles multiple arguments', () => {
-  sinon.restore(); // Ensure no previous stubs exist
   const branchNameLint = new BranchNameLint();
   const callback = sinon.stub(console, 'error');
   const answer = branchNameLint.error('Error: %s, Code: %d', 'Invalid branch', 404);
@@ -164,6 +167,35 @@ test('doValidation applies suggestions', () => {
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
+});
+
+// Add tests for disabling separator and prefix checks
+test('doValidation allows branch without separator when separator is set to false', () => {
+  sinon.stub(childProcess, 'execFileSync').returns('feature-valid-name');
+  const branchNameLint = new BranchNameLint({
+    separator: false
+  });
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
+});
+
+test('doValidation allows any prefix when prefixes is set to false', () => {
+  sinon.stub(childProcess, 'execFileSync').returns('custom/valid-name');
+  const branchNameLint = new BranchNameLint({
+    prefixes: false
+  });
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
+});
+
+test('doValidation allows both prefix and separator to be disabled', () => {
+  sinon.stub(childProcess, 'execFileSync').returns('anything-goes');
+  const branchNameLint = new BranchNameLint({
+    prefixes: false,
+    separator: false
+  });
+  const result = branchNameLint.doValidation();
+  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
 });
 
 // Add tests for JavaScript configuration support
