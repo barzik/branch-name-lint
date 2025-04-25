@@ -24,7 +24,8 @@
     "access": "public"
   },
   "scripts": {
-    "test": "node test.js",
+    "test": "node test.js && npm run e2e",
+    "e2e": "node ./e2e-test.js",
     "prepack": "npm prune --production && del package-lock.json && npm shrinkwrap",
     "postpack": "git checkout package-lock.json && git clean -f npm-shrinkwrap.json",
     "release": "npm publish",
@@ -53,6 +54,7 @@
     "eslint-plugin-import": "^2.23.4",
     "husky": "^6.0.0",
     "nyc": "^15.1.0",
+    "rimraf": "^6.0.1",
     "sinon": "^11.1.1"
   }
 }
