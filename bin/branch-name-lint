@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const path = require('path');
 const findUp = require('find-up');
 const meow = require('meow');
 const BranchNameLint = require('../index');
 
 const cli = meow(`
 	Usage
-	  $ npx branch-name-lint [configuration-file.json]
+	  $ npx branch-name-lint [configuration-file.json|configuration-file.js]
 
 	Options
 	  --help - to get this screen
@@ -15,7 +16,7 @@ const cli = meow(`
 	Examples
 	  $ branch-name-lint
 	  Use default configutation or the configuration specified in package.json to validate & lint the branch name.
-	  $ branch-name-lint [configuration-file.json]
+	  $ branch-name-lint [configuration-file.json|configuration-file.js]
 	  Use configutation file to validate & lint the branch name.
 `);
 const configFileName = cli.input[0];
@@ -32,8 +33,34 @@ class BranchNameLintCli {
 
 	loadConfiguration(filename = 'package.json') {
 		const pkgFile = findUp.sync(filename);
-		const pkg = JSON.parse(fs.readFileSync(pkgFile));
-		return (pkg.branchNameLinter) || {};
+		if (!pkgFile) {
+			console.error(`Could not find configuration file: ${filename}`);
+			process.exit(1);
+		}
+		
+		const fileExtension = path.extname(pkgFile).toLowerCase();
+		
+		// Load JS files using require
+		if (fileExtension === '.js') {
+			try {
+				// Use absolute path for require
+				const config = require(pkgFile);
+				return config.branchNameLinter || config;
+			} catch (error) {
+				console.error(`Error loading JavaScript configuration: ${error.message}`);
+				process.exit(1);
+			}
+		} 
+		// Load JSON files as before
+		else {
+			try {
+				const pkg = JSON.parse(fs.readFileSync(pkgFile));
+				return (pkg.branchNameLinter) || {};
+			} catch (error) {
+				console.error(`Error parsing JSON configuration: ${error.message}`);
+				process.exit(1);
+			}
+		}
 	}
 }
 

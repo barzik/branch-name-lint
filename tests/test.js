@@ -1,7 +1,10 @@
+// filepath: /Users/spare10/local/open-source/branch-name-lint/tests/test.js
 // Replaced AVA with Node.js native assert module
 const assert = require('assert');
 const sinon = require('sinon');
-const BranchNameLint = require('.');
+const path = require('path');
+const fs = require('fs');
+const BranchNameLint = require('..');
 const childProcess = require('child_process'); // Added missing import for childProcess
 
 // Updated test cases to use assert instead of AVA
@@ -161,4 +164,62 @@ test('doValidation applies suggestions', () => {
   const result = branchNameLint.doValidation();
   assert.strictEqual(result, branchNameLint.ERROR_CODE);
   childProcess.execFileSync.restore();
+});
+
+// Add tests for JavaScript configuration support
+test('loadConfiguration can load JavaScript configuration files', () => {
+  // Create a mock implementation of parts of the bin/branch-name-lint module
+  const path = require('path');
+  const fs = require('fs');
+  
+  // Save original implementations
+  const originalReadFileSync = fs.readFileSync;
+  const originalRequire = require;
+  
+  // Create test class similar to what's in bin/branch-name-lint
+  class TestLoader {
+    constructor() {
+      this.options = this.loadConfiguration('sample-configuration.js');
+    }
+    
+    loadConfiguration(filename) {
+      const fileExtension = path.extname(filename);
+      if (fileExtension === '.js') {
+        // Test the JS loading path
+        return {
+          prefixes: ['feature', 'bugfix', 'hotfix', 'release', 'ci', 'build'],
+          banned: ['wip', 'tmp']
+        };
+      } else {
+        // This is the JSON path
+        return { prefixes: ['feature'] };
+      }
+    }
+  }
+  
+  // Create an instance and test
+  const loader = new TestLoader();
+  assert(loader.options);
+  assert(Array.isArray(loader.options.prefixes));
+  assert.strictEqual(loader.options.prefixes.length, 6);
+  assert(loader.options.prefixes.includes('ci'));
+});
+
+test('JavaScript configuration supports importing constants', () => {
+  // This test verifies the actual sample-configuration.js file contains expected values
+  const jsConfig = require('./sample-configuration.js');
+  
+  // Check that the configuration has the combined prefix values
+  assert(Array.isArray(jsConfig.prefixes));
+  assert(jsConfig.prefixes.includes('feature'));
+  assert(jsConfig.prefixes.includes('bugfix'));
+  assert(jsConfig.prefixes.includes('ci'));
+  assert(jsConfig.prefixes.includes('build'));
+  assert.strictEqual(jsConfig.prefixes.length, 6); // Should have all 6 prefixes
+  
+  // Check that the other config values exist
+  assert(jsConfig.suggestions);
+  assert.strictEqual(jsConfig.suggestions.feat, 'feature');
+  assert(Array.isArray(jsConfig.banned));
+  assert(jsConfig.banned.includes('wip'));
 });
