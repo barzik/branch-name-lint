@@ -320,28 +320,43 @@ test('doValidation is throwing error on banned', () => {
 });
 
 test('doValidation is using correct error message on regex mismatch', () => {
-  sinon.stub(childProcess, 'execFileSync').returns('feature/invalid_characters');
-  const branchNameLint = new BranchNameLint({
-    msgDoesNotMatchRegex: 'my error message',
-    regex: '^[a-z0-9/-]+$',
-    regexOptions: 'i',
-  });
-  const errorStub = sinon.stub(branchNameLint, 'error');
-  branchNameLint.doValidation();
-  assert(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
-  errorStub.restore();
-  childProcess.execFileSync.restore();
+  // Ensure no environment variables are interfering
+  const originalEnv = process.env;
+  try {
+    process.env = {}; // Clear environment variables for this test
+    
+    sinon.stub(childProcess, 'execFileSync').returns('feature/invalid_characters');
+    const branchNameLint = new BranchNameLint({
+      msgDoesNotMatchRegex: 'my error message',
+      regex: '^[a-z0-9/-]+$',
+      regexOptions: 'i',
+    });
+    const errorStub = sinon.stub(branchNameLint, 'error');
+    branchNameLint.doValidation();
+    assert(errorStub.calledWith('my error message', 'feature/invalid_characters', '^[a-z0-9/-]+$'));
+  } finally {
+    process.env = originalEnv; // Restore environment variables
+    sinon.restore();
+  }
 });
 
 test('doValidation is passing on skip', () => {
-  sinon.stub(childProcess, 'execFileSync').returns('develop');
-  const mockOptions = {
-    skip: ['develop'],
-  };
-  const branchNameLint = new BranchNameLint(mockOptions);
-  const result = branchNameLint.doValidation();
-  assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
-  childProcess.execFileSync.restore();
+  // Ensure no environment variables are interfering
+  const originalEnv = process.env;
+  try {
+    process.env = {}; // Clear environment variables for this test
+    
+    sinon.stub(childProcess, 'execFileSync').returns('develop');
+    const mockOptions = {
+      skip: ['develop'],
+    };
+    const branchNameLint = new BranchNameLint(mockOptions);
+    const result = branchNameLint.doValidation();
+    assert.strictEqual(result, branchNameLint.SUCCESS_CODE);
+  } finally {
+    process.env = originalEnv; // Restore environment variables
+    sinon.restore();
+  }
 });
 
 test('doValidation applies suggestions', () => {
