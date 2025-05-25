@@ -74,7 +74,7 @@ Any Valid JSON file with `branchNameLinter` attribute.
 
 ### Specifying a Custom Branch Name
 
-You can specify a custom branch name to validate instead of using the current git branch in two ways:
+You can specify a custom branch name to validate instead of using the current git branch in three ways:
 
 1. Using the CLI flag:
    ```
