@@ -1,0 +1,35 @@
+---
+description: JavaScript coding rules for branch-name-lint
+globs: ["**/*.js"]
+alwaysApply: false
+---
+
+## Shell Command Safety
+
+Always use `execFileSync` with an argument array when invoking shell commands. Never use `exec` or `execSync` with a concatenated string.
+
+```js
+// correct
+childProcess.execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD']);
+
+// forbidden
+childProcess.execSync(`git ${userInput}`);
+```
+
+## CommonJS Only — No ESM Mixing
+
+This project uses CommonJS (`require` / `module.exports`) exclusively. Do not introduce `import` / `export` syntax or mix module systems.
+
+```js
+// correct
+const { something } = require('./something');
+module.exports = MyClass;
+
+// forbidden
+import { something } from './something';
+export default MyClass;
+```
+
+## Test Coverage for New Validation Rules
+
+Any new validation method added to `BranchNameLint` must have a corresponding test in `tests/test.js`. Follow the existing sinon mock patterns used throughout that file.
